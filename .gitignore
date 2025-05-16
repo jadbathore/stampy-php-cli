@@ -1,0 +1,8 @@
+Cargo.lock
+Composer.lock
+
+.DS_Store
+.direnv/
+/vendor
+/target/debug 
+/target/.rustc_info.json
