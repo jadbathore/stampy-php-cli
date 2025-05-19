@@ -9,7 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 
-console = "0.15.11"
+crossterm = "0.29.0"
 dialoguer = "0.11.0"
 phper = "0.16"
 
