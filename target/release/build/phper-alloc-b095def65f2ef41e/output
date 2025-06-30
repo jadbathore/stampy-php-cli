@@ -1,0 +1,4 @@
+cargo::rustc-cfg=phper_major_version="8"
+cargo::rustc-cfg=phper_minor_version="4"
+cargo::rustc-cfg=phper_release_version="6"
+cargo::rustc-cfg=phper_enum_supported

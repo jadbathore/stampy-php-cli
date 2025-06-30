@@ -16,7 +16,7 @@
 
 // pub fn class_dialoguer()->ClassEntity<()>
 // { 
-//     let mut class:ClassEntity<()> = ClassEntity::new("Dialoguer");
+    // let mut class:ClassEntity<()> = ClassEntity::new("Dialoguer");
 //     // class.add_static_property("password_state", Visibility::Private, password_state);
 //     method_string_plus_theme(
 //         class.add_static_method("Confirm",Visibility::Public,method_confirm)

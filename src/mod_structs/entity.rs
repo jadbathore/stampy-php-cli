@@ -1,25 +1,20 @@
-use console::Term;
-use dialoguer::{console, Confirm, Input, MultiSelect, Select, Password};
-use phper::{
-    arrays::ZArray, 
-    classes::{ClassEntity}, 
-    values::ZVal,
-};
-use crossterm::{ExecutableCommand};
+use phper::classes::ClassEntity;
+
 
 pub struct DialoguerEntity {
-    class: ClassEntity<()>,
+    class: ClassEntity<()>
 }
 
-impl DialoguerEntity {
+impl<'a> DialoguerEntity {
     pub fn new(class:ClassEntity<()>)->Self
     {
-        Self { class: class }
+        Self { 
+            class: class
+        }
     }
 
     pub fn class(&self)-> &ClassEntity<()>
     {
         &self.class
     }
-
 }

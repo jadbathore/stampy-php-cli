@@ -15,7 +15,7 @@ require_once "vendor/autoload.php";
 // Dialoguer::multiSelect('choisis parmit c\'est reponse ',["a","b","c"]);
 // Dialoguer::test(Theme::ColorfulTheme);
 // var_dump(Theme::ColorfulTheme->value);
-Dialoguer::confirm("blabla");
+Dialoguer::input("blabla");
 
 // var_dump($test);
 // $test = Dialoguer::confirm("bonjour est que ça va ?");

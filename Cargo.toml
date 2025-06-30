@@ -8,7 +8,7 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
-
+console = "0.16.0"
 crossterm = "0.29.0"
 dialoguer = "0.11.0"
 phper = "0.16"
