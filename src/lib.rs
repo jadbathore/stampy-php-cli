@@ -1,10 +1,11 @@
-use phper::{functions::Argument, modules::Module, php_get_module};
+use phper::{modules::Module, php_get_module};
+// use dialoguer::Password;
 
-mod hello;
 mod dialoguer_class;
 mod dialoguer_enum;
-pub mod enums;
-pub mod structs;
+pub mod mod_enums;
+pub mod mod_structs;
+pub mod mod_traits;
 
 
 
@@ -15,8 +16,8 @@ pub fn get_module() -> Module {
         env!("CARGO_PKG_VERSION"),
         env!("CARGO_PKG_AUTHORS"),
     );
-    module.add_function("say_hello", hello::say_hello).argument(Argument::new("name"));
-    module.add_class(dialoguer_class::class_dialoguer());
+    // let mut password_instance:Password  = Password::new();
+    // module.add_class(dialoguer_class::class_dialoguer());
     module.add_enum(dialoguer_enum::enum_dialoguer());
     module
 }
