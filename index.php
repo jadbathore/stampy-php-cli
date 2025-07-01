@@ -11,11 +11,13 @@ require_once "vendor/autoload.php";
 // }
 // var_dump(Theme::ColorfulTheme->value);
 // Dialoguer::test(Theme::ColorfulTheme);
-// Dialoguer::select('choisis parmit c\'est reponse ',["a","b","c"]);
+Dialoguer::select('choisis parmit c\'est reponse ',["a","b","c"],true);
 // Dialoguer::multiSelect('choisis parmit c\'est reponse ',["a","b","c"]);
 // Dialoguer::test(Theme::ColorfulTheme);
 // var_dump(Theme::ColorfulTheme->value);
-Dialoguer::input("blabla");
+// Dialoguer::input("blabla");
+// Dialoguer::confirm("test",true);
+
 
 // var_dump($test);
 // $test = Dialoguer::confirm("bonjour est que ça va ?");
