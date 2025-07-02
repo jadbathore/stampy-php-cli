@@ -1,33 +1,17 @@
+#!/usr/bin/env php
 <?php 
+// require_once 'vendor/autoload.php';
 
-require_once "vendor/autoload.php";
+// // require_once './public/ModelAutoloader.php';
 
-// class test {
-//     public $dialoguer =  Dialoguer::class;
 
-//     public function test(){
-//         $this->dialoguer::confirm("bonjour");
-//     }
+// use App\Controller\BinController;
+// use App\Model\Class\ControllerHandler\BinControllerHandler;
+// use App\Model\Class\Singletone\ErrorHandler;
+// try{
+//     $action = new BinControllerHandler(BinController::class,$argv);
+//     $action->start();
+// }catch(Error $e){
+//     $errorHandler = &ErrorHandler::instance($e);
+//     $errorHandler->debugInfo();
 // }
-// var_dump(Theme::ColorfulTheme->value);
-// Dialoguer::test(Theme::ColorfulTheme);
-Dialoguer::select('choisis parmit c\'est reponse ',["a","b","c"],true);
-// Dialoguer::multiSelect('choisis parmit c\'est reponse ',["a","b","c"]);
-// Dialoguer::test(Theme::ColorfulTheme);
-// var_dump(Theme::ColorfulTheme->value);
-// Dialoguer::input("blabla");
-// Dialoguer::confirm("test",true);
-
-
-// var_dump($test);
-// $test = Dialoguer::confirm("bonjour est que ça va ?");
-
-// if ($test){
-//     echo "super";
-// } else {
-//     echo "ça va aller t'inquete";
-// }
-
-// $name = Dialoguer::input("comment tu t'appel");
-
-// echo "salut $name";

@@ -17,6 +17,7 @@ pub fn enum_dialoguer()-> EnumEntity<String>
 
 
 
+
 // fn method_get_theme_by_name<'a>(arguments:&'a mut [ZVal])->Result<Option<ColorfulTheme>, phper::Error>
 // {
 

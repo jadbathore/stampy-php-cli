@@ -4,7 +4,8 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-            "Stampy\\PhpCli\\": "src/"
+            "Stampy\\PhpCli\\": "src/",
+            "App\\":"app/"
         }
     },
     "authors": [

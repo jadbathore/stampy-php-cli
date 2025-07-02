@@ -10,6 +10,7 @@ use dialoguer::{console::Term, theme::{ColorfulTheme, Theme}, Confirm, Input, Mu
 use crate::{mod_enums::{self, actions::Actions, themes},mod_traits};
 use mod_enums::arguments::ArgumentUsage;
 use mod_traits::builder::builder_class::BuilderClass;
+use std::borrow::Cow;
 
 #[derive(Default)]
 pub struct DialoguerBuilder<T:'static>
@@ -22,13 +23,27 @@ impl DialoguerBuilder<()> {
     fn input(arguments:&mut [ZVal])->Result<String, phper::Error>
     {
         let promps:&str = arguments[0].expect_z_str()?.to_str()?;
-        let input = Input::<String>::new()
-        .with_prompt(promps).interact_text().unwrap();
-        Ok(input)
+        let mut arg_list = arguments.iter();
+        let (arg1,arg2,arg3) = (arg_list.next(),arg_list.next(),arg_list.next());
+        let mut result:String = String::new();
+        if let (Some(_),Some(theme),None) = (arg1,arg2,arg3){
+            let with_theme:bool = theme.expect_bool()?;
+            let confirm= Self::with_custom_theme(with_theme,|theme| {
+            if let Some(theme) = theme {
+                Input::<String>::with_theme(theme).with_prompt(promps).interact_text()
+            } else {
+                Input::<String>::new().with_prompt(promps).interact_text()
+            }
+            });
+            result = confirm.unwrap();
+        } else if let (Some(_),None)= (arg1,arg2) {
+            result = Input::<String>::new().with_prompt(promps).interact().unwrap();
+        } 
+        Ok(result)
     }
 
     /// in php Dialoguer::confirm
-    fn confirm(arguments:&mut [ZVal])->Result<bool, phper::Error>
+    fn confirm<'a>(arguments:&mut [ZVal])->Result<bool, phper::Error>
     {
         let promps:&str = arguments[0].expect_z_str()?.to_str()?;
         let mut arg_list = arguments.iter();
@@ -36,14 +51,14 @@ impl DialoguerBuilder<()> {
         let mut result:bool = false;
         if let (Some(_),Some(theme),None) = (arg1,arg2,arg3){
             let with_theme:bool = theme.expect_bool()?;
-            let confirm = Self::with_custom_theme(with_theme,|theme| {
+            let test =Self::with_custom_theme(with_theme, |theme| {
             if let Some(theme) = theme {
-                Confirm::with_theme(&theme).with_prompt(promps).interact()
+                Confirm::with_theme(theme).with_prompt(promps).interact()
             } else {
                 Confirm::new().with_prompt(promps).interact()
             }
             });
-            result = confirm.unwrap();
+            result = test.unwrap();
         } else if let (Some(_),None)= (arg1,arg2) {
             let confirm:Confirm<'static> = Confirm::new();
             result = confirm.with_prompt(promps).interact().unwrap();
@@ -63,7 +78,7 @@ impl DialoguerBuilder<()> {
             let with_theme:bool = theme.expect_bool()?;
             let select = Self::with_custom_theme(with_theme,|theme| {
             if let Some(theme) = theme {
-                Select::with_theme(&theme).with_prompt(promps).items(&vec).interact()
+                Select::with_theme(theme).with_prompt(promps).items(&vec).interact()
             } else {
                 Select::new().with_prompt(promps).items(&vec).interact()
             }
@@ -91,7 +106,7 @@ impl DialoguerBuilder<()> {
             let with_theme:bool = theme.expect_bool()?;
             let select = Self::with_custom_theme(with_theme,|theme| {
             if let Some(theme) = theme {
-                MultiSelect::with_theme(&theme).with_prompt(promps).items(&vec).interact_on(&stdout)
+                MultiSelect::with_theme(theme).with_prompt(promps).items(&vec).interact_on(&stdout)
             } else {
                 MultiSelect::new().with_prompt(promps).items(&vec).interact_on(&stdout)
             }
@@ -111,12 +126,12 @@ impl DialoguerBuilder<()> {
         let promps:&str = arguments[0].expect_z_str()?.to_str()?;
         let mut arg_list = arguments.iter();
         let (arg1,arg2,arg3) = (arg_list.next(),arg_list.next(),arg_list.next());
-        let mut result:String;
+        let mut result:String = String::new();
         if let (Some(_),Some(theme),None) = (arg1,arg2,arg3) {
             let with_theme:bool = theme.expect_bool()?;
             let select = Self::with_custom_theme(with_theme,|theme| {
             if let Some(theme) = theme {
-                Password::with_theme(&theme)
+                Password::with_theme(theme)
                 .with_prompt(promps)
                 .with_confirmation("confirm password", "Passwords mismatching")
                 .interact()
@@ -160,11 +175,12 @@ impl DialoguerBuilder<()> {
 
     
     fn with_custom_theme<A,T>(with_theme:bool,builder: A) -> T
-    where A: FnOnce(Option<ColorfulTheme>) -> T,
+    where 
+        A: FnOnce(Option<&ColorfulTheme>) -> T
     {
         if with_theme {
-            let theme = ColorfulTheme::default();
-            builder(Some(theme))
+            let theme:ColorfulTheme = ColorfulTheme::default();
+            builder(Some(&theme))
         } else{ 
             builder(None)
         }
@@ -208,7 +224,7 @@ impl BuilderClass for DialoguerBuilder<()>
             Self::set_arguments(ArgumentUsage::StringWithOptionalTheme, class.add_static_method("confirm", Visibility::Public,Self::confirm));
             Self::set_arguments(ArgumentUsage::StringWithOptionalTheme, class.add_static_method("input",Visibility::Public, Self::input));
             Self::set_arguments(ArgumentUsage::StringAndListWithOptionalTheme, class.add_static_method("select", Visibility::Public, Self::select));
-            Self::set_arguments(ArgumentUsage::StringAndListWithOptionalTheme, class.add_static_method("Multiselect", Visibility::Public, Self::multi_select));
+            Self::set_arguments(ArgumentUsage::StringAndListWithOptionalTheme, class.add_static_method("multiSelect", Visibility::Public, Self::multi_select));
             Self::set_arguments(ArgumentUsage::StringWithOptionalTheme, class.add_static_method("password",Visibility::Public, Self::password));
         }
     }
