@@ -6,9 +6,11 @@ use App\Model\Abstract\AbstractPrompsController;
 use App\Model\Attributes\Command;
 use App\Model\Attributes\Description;
 use App\Model\Attributes\Option;
+use App\Model\Class\Object\Option_CLI;
 use Dialoguer;
 
 // use App\Model\Interface\Dialoguer;
+
 
 class BinController extends AbstractPrompsController
 {
@@ -17,18 +19,17 @@ class BinController extends AbstractPrompsController
         Command('test'),
         Option(
             [
-                '-test'=>'<dtest>',
-                '-b'=>true
+                '-test'=> new Option_CLI(false,"blabla"),
+                '-b'=> new Option_CLI(false,"blabla")
             ])
         ,Description('Test function')
     ]
     public function test(
         null|string|bool $dtest,
-        null|bool $b
+        null|string|bool $b
         ){
-            // \Dialoguer::confirm("aa");
-            Dialoguer::input('a');
-
+            \Dialoguer::editor("bonjour :");
+            $this->color("test","green");
             // dialoguer::confirm("blabla");
         }
 

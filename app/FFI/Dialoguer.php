@@ -12,4 +12,5 @@ interface Dialoguer {
      * @param string[] $list
      */
     public static function multiSelect(string $input,array $list,?Bool $theme=null);
+    public static function editor(string $input);
 }

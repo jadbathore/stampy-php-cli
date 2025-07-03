@@ -9,18 +9,22 @@ use App\Model\trait\Coloring;
 use App\Model\Interface\MethodCLIInterface;
 use \ReflectionMethod;
 
+
 class Option_CLI {
-
-    public private(set) bool $ad_input;
-
-    public private(set) ?string $description;
-
     public function __construct(
-        bool $ad_input,
-        ?string $description = null
+        private bool $ad_input,
+        private ?string $description = null
     ){
-        $this->$ad_input = $ad_input;
-        $this->$description = $description;
+    }
+
+    public function getAdInput():bool
+    {
+        return $this->ad_input;
+    }
+
+    public function getDescription():?string
+    {
+        return $this->description;
     }
 }
 

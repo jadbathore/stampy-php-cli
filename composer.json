@@ -14,6 +14,7 @@
         }
     ],
     "scripts":{
-        "test":["php -d extension=target/release/libstampy_php_cli.dylib index.php"]
+        "bin":["sudo ./bin"],
+        "test":["php test.php"]
     }
 }

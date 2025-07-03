@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if ! alias stampy &>/dev/null; then
+    alias stampy='./bin'
+fi
+
+ext="extension=target/release/libstampy_php_cli.dylib"
+if [ $# -eq 0 ]; then
+    php -d $ext index.php
+    exit 1
+fi
+
+args=""
+for arg in "$@";do
+    args="$args $arg"
+done
+
+php -d $ext index.php $args

@@ -1,4 +1,5 @@
 pub enum ArgumentUsage {
     StringWithOptionalTheme,
-    StringAndListWithOptionalTheme
+    StringAndListWithOptionalTheme,
+    String
 }

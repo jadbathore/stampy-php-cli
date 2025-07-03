@@ -5,7 +5,7 @@ namespace App\Model\Attributes;
 use App\Model\Class\Object\Option_CLI;
 use Attribute;
 
-#[Attribute]
+#[Attribute(self::TARGET_METHOD)]
 class Option {
     /**
      * @param Option_CLI[]

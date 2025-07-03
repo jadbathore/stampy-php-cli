@@ -7,7 +7,9 @@ use App\Model\Attributes\Description;
 use App\Model\Attributes\Option;
 use App\Model\trait\Coloring;
 use App\Model\Interface\MethodCLIInterface;
+use App\Model\Class\Object\Option_CLI;
 use \ReflectionMethod;
+
 class Method_CLI implements MethodCLIInterface {
 
     use Coloring;
@@ -16,7 +18,7 @@ class Method_CLI implements MethodCLIInterface {
     private array $promps = [];
     private ?string $description;
     private string $command;
-    private ReflectionMethod $invokable;
+    private object $invokable;
 
     public function __construct(private ReflectionMethod $method)
     {
@@ -66,6 +68,9 @@ class Method_CLI implements MethodCLIInterface {
         return (isset($this->description))? $this->description:null;
     }
 
+    /**
+     * @return ?Object_CLI
+     */
     public function getOptions(): null|array
     {
         return (isset($this->options))?$this->options[0]:null;
@@ -126,7 +131,13 @@ class Method_CLI implements MethodCLIInterface {
                     $this->color($this->getCommand(),$color,"italic");
                 break;
                 case Option::class:
-                    $this->color("<".implode(">\t<",array_keys($this->getOptions())).">",$color,"italic");
+                    foreach ($this->getOptions() as $key => $value) {
+                        if ($value instanceof Option_CLI){
+                            $this->color("\n\t<$key>: {$value->getDescription()}",$color,"italic");
+                        } else {
+                        
+                        }
+                    }
                 break;
                 case Description::class:
                     $this->color($this->getDescription(),$color,"italic");

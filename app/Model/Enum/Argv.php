@@ -4,6 +4,7 @@ namespace App\Model\Enum;
 
 use App\Model\Interface\ArgvInterface;
 use App\Model\Interface\MethodCLIInterface;
+use App\Model\class\Object\Option_CLI;
 
 enum Argv:string 
 {
@@ -28,11 +29,12 @@ enum Argv:string
         };
     }
     
-    private static function inputTypeHandler(array $optionList,ArgvInterface $argv):bool{
+    /**
+     * @param Option_CLI[] $optionList
+     */
+    private static function inputTypeHandler(array $optionList,ArgvInterface $argv):bool {
         if(in_array($argv->getLast(),array_keys($optionList))){
-            if(is_string($optionList[$argv->getLast()])){
-                return true;
-            }
+            return $optionList[$argv->getLast()]->getAdInput();
         }
         return false;
     }
