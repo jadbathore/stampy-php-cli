@@ -8,7 +8,7 @@ use phper::{
 };
 use dialoguer::{console::Term, theme::{ColorfulTheme}, Confirm, Editor, Input, MultiSelect, Password, Select};
 use crate::{mod_enums::{self},mod_traits};
-use mod_enums::arguments::ArgumentUsage;
+use mod_enums::arguments::ArgumentUsageDialoguer;
 use mod_traits::builder::builder_class::BuilderClass;
 
 #[derive(Default)]
@@ -200,15 +200,15 @@ impl DialoguerBuilder<()> {
 
 
 impl<T> DialoguerBuilder<T> {
-    fn set_arguments(argument_usage:ArgumentUsage,method_entity:&mut MethodEntity){
+    fn set_arguments(argument_usage:ArgumentUsageDialoguer,method_entity:&mut MethodEntity){
         match argument_usage {
-            ArgumentUsage::StringWithOptionalTheme => {
+            ArgumentUsageDialoguer::StringWithOptionalTheme => {
                 method_entity.argument(Argument::new("input").with_type_hint(ArgumentTypeHint::String))
                 .argument(Argument::new("theme")
                 .with_type_hint(ArgumentTypeHint::Bool)
                 .optional());
             },
-            ArgumentUsage::StringAndListWithOptionalTheme => {
+            ArgumentUsageDialoguer::StringAndListWithOptionalTheme => {
                 method_entity
                 .argument(Argument::new("input").with_type_hint(ArgumentTypeHint::String))
                 .argument(Argument::new("list").with_type_hint(ArgumentTypeHint::Array))
@@ -218,7 +218,7 @@ impl<T> DialoguerBuilder<T> {
                     .optional()
                 );
             }
-            ArgumentUsage::String => {
+            ArgumentUsageDialoguer::String => {
                 method_entity.argument(Argument::new("input").with_type_hint(ArgumentTypeHint::String));
             }
         }
@@ -235,12 +235,12 @@ impl BuilderClass for DialoguerBuilder<()>
 
     fn set_methods(&mut self) {
         if let Some(class) = &mut self.class {
-            Self::set_arguments(ArgumentUsage::String, class.add_static_method("editor", Visibility::Public,Self::editor));
-            Self::set_arguments(ArgumentUsage::StringWithOptionalTheme, class.add_static_method("confirm", Visibility::Public,Self::confirm));
-            Self::set_arguments(ArgumentUsage::StringWithOptionalTheme, class.add_static_method("input",Visibility::Public, Self::input));
-            Self::set_arguments(ArgumentUsage::StringAndListWithOptionalTheme, class.add_static_method("select", Visibility::Public, Self::select));
-            Self::set_arguments(ArgumentUsage::StringAndListWithOptionalTheme, class.add_static_method("multiSelect", Visibility::Public, Self::multi_select));
-            Self::set_arguments(ArgumentUsage::StringWithOptionalTheme, class.add_static_method("password",Visibility::Public, Self::password));
+            Self::set_arguments(ArgumentUsageDialoguer::String, class.add_static_method("editor", Visibility::Public,Self::editor));
+            Self::set_arguments(ArgumentUsageDialoguer::StringWithOptionalTheme, class.add_static_method("confirm", Visibility::Public,Self::confirm));
+            Self::set_arguments(ArgumentUsageDialoguer::StringWithOptionalTheme, class.add_static_method("input",Visibility::Public, Self::input));
+            Self::set_arguments(ArgumentUsageDialoguer::StringAndListWithOptionalTheme, class.add_static_method("select", Visibility::Public, Self::select));
+            Self::set_arguments(ArgumentUsageDialoguer::StringAndListWithOptionalTheme, class.add_static_method("multiSelect", Visibility::Public, Self::multi_select));
+            Self::set_arguments(ArgumentUsageDialoguer::StringWithOptionalTheme, class.add_static_method("password",Visibility::Public, Self::password));
         }
     }
 

@@ -7,8 +7,9 @@ use Attribute;
 
 #[Attribute(self::TARGET_METHOD)]
 class Option {
+
     /**
-     * @param Option_CLI[]
+     * @param ?Option_CLI[] $method
      */
     public function __construct(
         private ?array $method=null,

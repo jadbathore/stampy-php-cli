@@ -1,5 +1,9 @@
-pub enum ArgumentUsage {
+pub enum ArgumentUsageDialoguer {
     StringWithOptionalTheme,
     StringAndListWithOptionalTheme,
     String
+}
+
+pub enum ArgumentUsageNamespaceHandler {
+    PathWithNameSpace,
 }

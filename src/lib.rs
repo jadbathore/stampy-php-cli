@@ -1,6 +1,9 @@
 use phper::{modules::Module, php_get_module};
 
-use crate::{mod_structs::{builder::{builder_class::DialoguerBuilder, director::Director}}, mod_traits::builder::builder_class::BuilderClass};
+use crate::{
+    mod_structs::builder::{class::DialoguerBuilder, namespacehandler::NamespaceHandler, director::Director}, 
+    mod_traits::builder::builder_class::BuilderClass
+};
 // use dialoguer::Password;
 
 pub mod mod_enums;
@@ -16,9 +19,16 @@ pub fn get_module() -> Module {
         env!("CARGO_PKG_VERSION"),
         env!("CARGO_PKG_AUTHORS"),
     );
+
     let mut dialoguer_builder:DialoguerBuilder<()> = DialoguerBuilder::default();
     Director::construct_dialoguer(&mut dialoguer_builder);
     let dialoguer_class = dialoguer_builder.build();
     module.add_class(dialoguer_class);
+
+    let mut namespacehandler_builder:NamespaceHandler<()> = NamespaceHandler::default();
+    Director::construct_namespacehandler(&mut namespacehandler_builder);
+    let namespacehandler_class = namespacehandler_builder.build();
+    module.add_class(namespacehandler_class);
+
     module
 }

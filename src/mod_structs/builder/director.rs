@@ -7,4 +7,9 @@ impl Director {
         builder.set_class("Dialoguer");
         builder.set_methods();
     }
+
+    pub fn construct_namespacehandler(builder: &mut impl BuilderClass){
+        builder.set_class("NameSpaceHandler");
+        builder.set_methods();
+    }
 }

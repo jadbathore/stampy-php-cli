@@ -1,16 +1,12 @@
 <?php
 namespace App\Controller;
 
-use Error;
 use App\Model\Abstract\AbstractPrompsController;
 use App\Model\Attributes\Command;
 use App\Model\Attributes\Description;
 use App\Model\Attributes\Option;
 use App\Model\Class\Object\Option_CLI;
 use Dialoguer;
-
-// use App\Model\Interface\Dialoguer;
-
 
 class BinController extends AbstractPrompsController
 {
@@ -19,17 +15,19 @@ class BinController extends AbstractPrompsController
         Command('test'),
         Option(
             [
-                '-test'=> new Option_CLI(false,"blabla"),
-                '-b'=> new Option_CLI(false,"blabla")
+                '-test'=> new Option_CLI(true,"test option with input"),
+                '-b'=> new Option_CLI(false,"test option without input")
             ])
         ,Description('Test function')
     ]
     public function test(
-        null|string|bool $dtest,
-        null|string|bool $b
+        null|string|bool $test,
+        null|bool $b
         ){
-            \Dialoguer::editor("bonjour :");
+            // Dialoguer::editor("bonjour :");
             $this->color("test","green");
+    var_dump(get_declared_classes());
+
             // dialoguer::confirm("blabla");
         }
 
