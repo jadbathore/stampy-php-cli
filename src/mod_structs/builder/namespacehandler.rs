@@ -11,9 +11,10 @@ use crate::
         mod_enums::arguments::{ArgumentUsageNamespaceHandler}, 
         mod_traits
     };
-
+use std::{ffi::{OsStr, OsString}, fs::{DirEntry, ReadDir}, io::ErrorKind, path::Path};
+use std::path::PathBuf;
 use mod_traits::builder::builder_class::BuilderClass;
-use std::{io::Error, fs::{self, DirEntry}};
+use std::{fs, io::Error};
 
 #[derive(Default)]
 pub struct NamespaceHandler<T:'static>
@@ -22,29 +23,54 @@ pub struct NamespaceHandler<T:'static>
 }
 
 impl NamespaceHandler<()> {
-    const fn recursive_path<'a>(path:&'a str,actualNamespace:&'a str)->Result<(),Error> {
-        for entry in fs::read_dir(path)? {
-            let dir = entry?;
-
-            if {
-                println!("{:?},{:?}", dir.path(),a);
-                break;
-            }
+    fn recursive_path<'a,'b>(path:&'a str,namespace_full:&'a str)->Result<Option<Vec<OsString>>,Error>
+    {
+        let namespace = namespace_full.split("\\").collect::<Vec<&str>>().into_iter().last();
+        if let Some(namespace) = namespace {
+            
+            let mut vec:Vec<OsString> = Vec::new();
+                    match fs::read_dir::<&str>(path)?.into_iter() {
+                        mut iter => loop {
+                            match iter.next() {
+                                None => break,
+                                Some(entry) => { 
+                                    let dir:DirEntry = entry?;
+                                    if dir.file_name() == namespace {
+                                        for entry in fs::read_dir::<PathBuf>(dir.path())? {
+                                            let dir:DirEntry = entry?;
+                                            let mut file = dir.path();
+                                            file.set_extension("");
+                                            let namespace = OsStr::new(namespace_full);
+                                            let mut result = OsString::from(namespace);
+                                            let backslash = OsStr::new("\\");
+                                            result.push(backslash);
+                                            result.push(file.file_name().unwrap());
+                                            vec.push(result);
+                                            dbg!();
+                                        }
+                                    }
+                                },
+                            };
+                        },
+                    };
+            Ok(Some(vec))
+        } else {
+            Ok(None)
         }
-        Ok(())
     }
 
     fn get_associted_class(arguments: &mut [ZVal])->Result<(), phper::Error>
     {
-        let path:&str = arguments[0].expect_z_str()?.to_str()?;
-        let namespace:&str = arguments[1].expect_z_str()?.to_str()?;
-        let parts: Vec<&str> = namespace.split('\\').collect();
-        let mut slice_iter = parts.iter();
-        let (_,b) = (slice_iter.next(),slice_iter.next());
-       
-
+        let path_arg:&str = arguments[0].expect_z_str()?.to_str()?;
+        let namespace_arg:&str = arguments[1].expect_z_str()?.to_str()?;
         
-        Ok::<(), phper::Error>(())
+        let test:Option<Vec<OsString>> = Self::recursive_path(path_arg, namespace_arg)?;
+        dbg!(test);
+        // let path_vec:Vec<&str> = path.split("/").collect();
+        // let path_iter =  path_vec.into_iter();
+        // let namespace_iter = namespace_vec.into_iter();
+
+        Ok(())
     }
 
 }

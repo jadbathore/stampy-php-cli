@@ -11,5 +11,4 @@ abstract class abstractPrompsController
 
     public function __construct(){}
 
-
 } 
