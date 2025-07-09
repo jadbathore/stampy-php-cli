@@ -1,4 +1,4 @@
-use crate::mod_traits::builder::builder_class::BuilderClass;
+use crate::mod_traits::builder::class::BuilderClass;
 
 pub struct Director;
 

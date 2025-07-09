@@ -1,0 +1,1 @@
+std::sync::mpsc::Receiver<Result<ReadDir, std::io::Error>>

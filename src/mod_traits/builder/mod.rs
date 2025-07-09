@@ -1,1 +1,2 @@
-pub mod builder_class;
+pub mod class;
+pub mod namespace;

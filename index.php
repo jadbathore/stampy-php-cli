@@ -17,4 +17,5 @@ use App\Model\Class\Singletone\ErrorHandler;
 // }
 
 
-NamespaceHandler::getAssocitedClass(__DIR__."/app","App\\Model\\Class\\Object");
+NamespaceHandler::getAssocitedClass(__DIR__."/app","App\\Model\\Class");
+

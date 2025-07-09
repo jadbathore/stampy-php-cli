@@ -9,7 +9,7 @@ use phper::{
 use dialoguer::{console::Term, theme::{ColorfulTheme}, Confirm, Editor, Input, MultiSelect, Password, Select};
 use crate::{mod_enums::{self},mod_traits};
 use mod_enums::arguments::ArgumentUsageDialoguer;
-use mod_traits::builder::builder_class::BuilderClass;
+use mod_traits::builder::class::BuilderClass;
 
 #[derive(Default)]
 pub struct DialoguerBuilder<T:'static>

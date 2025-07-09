@@ -2,7 +2,7 @@ use phper::{modules::Module, php_get_module};
 
 use crate::{
     mod_structs::builder::{class::DialoguerBuilder, namespacehandler::NamespaceHandler, director::Director}, 
-    mod_traits::builder::builder_class::BuilderClass
+    mod_traits::builder::class::BuilderClass
 };
 // use dialoguer::Password;
 

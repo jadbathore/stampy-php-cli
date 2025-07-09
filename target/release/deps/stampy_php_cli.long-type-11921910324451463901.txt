@@ -1,0 +1,1 @@
+_: FromIterator<Result<DirEntry, std::io::Error>>
