@@ -1,5 +1,8 @@
 <?php
 
+
 interface NamespaceHandler {
-    public static function getAssocitedClass(string $input,string $namespace);
+    public function __construct(string $input,string $namespace);
+    public function getAssocitedClass():Array;
+    public function getNamespace():String;
 }

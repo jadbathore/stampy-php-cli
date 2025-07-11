@@ -1,0 +1,1 @@
+fn(_) -> NameSpaceBuf<'_> {NameSpaceBuf::<'_>::from::<_>}

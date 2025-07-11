@@ -1,0 +1,2 @@
+Result<ClassEntity<()>, phper::errors::Error>
+Result<ClassEntity<()>, phper::Error>

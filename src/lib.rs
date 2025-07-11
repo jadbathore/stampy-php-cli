@@ -1,8 +1,8 @@
 use phper::{modules::Module, php_get_module};
 
 use crate::{
-    mod_structs::builder::{class::DialoguerBuilder, namespacehandler::NamespaceHandler, director::Director}, 
-    mod_traits::builder::class::BuilderClass
+    mod_structs::builder::{class::DialoguerBuilder, director::Director, namespacehandler::NamespaceHandler}, 
+    mod_traits::builder::class::{BuilderClass, BuilderPropertyClass}
 };
 // use dialoguer::Password;
 

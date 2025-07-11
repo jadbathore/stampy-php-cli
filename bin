@@ -6,7 +6,7 @@ fi
 
 ext="extension=target/release/libstampy_php_cli.dylib"
 if [ $# -eq 0 ]; then
-    php -d $ext index.php
+    php -d $ext index
     exit 1
 fi
 
@@ -15,4 +15,4 @@ for arg in "$@";do
     args="$args $arg"
 done
 
-php -d $ext index.php $args
+php -d $ext index $args

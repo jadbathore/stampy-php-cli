@@ -6,7 +6,7 @@ use App\Model\Iterator\AttributIterator_CLI;
 use \IteratorAggregate;
 use App\Model\Interface\MethodCLIInterface;
 
-class classAttributHandler_CLI implements IteratorAggregate
+class ClassAttributHandler_CLI implements IteratorAggregate
 {
     private $items = [];
     private ?methodCLIInterface $debuggingMethod;
