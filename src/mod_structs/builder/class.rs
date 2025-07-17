@@ -1,13 +1,9 @@
-use crossterm::ExecutableCommand;
+
 use phper::{
-    classes::{ClassEntity,Visibility}, 
-    functions::{Argument, MethodEntity},
-    values::{ZVal},
-    types::{ArgumentTypeHint},
-    arrays::ZArray
+    arrays::ZArray, classes::{ClassEntity,Visibility}, errors::{ArgumentCountError}, functions::{Argument, MethodEntity}, types::ArgumentTypeHint, values::ZVal
 };
-use dialoguer::{console::Term, theme::{ColorfulTheme}, Confirm, Editor, Input, MultiSelect, Password, Select};
-use crate::{mod_enums::{self},mod_traits};
+use dialoguer::{ theme::{ColorfulTheme}, Confirm, Editor, Input, MultiSelect, Password, Select};
+use crate::{mod_enums,mod_traits::{self, allow}};
 use mod_enums::arguments::ArgumentUsageDialoguer;
 use mod_traits::builder::class::BuilderClass;
 
@@ -18,141 +14,91 @@ pub struct DialoguerBuilder<T:'static>
 }
 
 impl DialoguerBuilder<()> {
-    
-    fn input(arguments:&mut [ZVal])->Result<String, phper::Error>
-    {
-        let promps:&str = arguments[0].expect_z_str()?.to_str()?;
-        let mut arg_list = arguments.iter();
-        let (arg1,arg2,arg3) = (arg_list.next(),arg_list.next(),arg_list.next());
-        let mut result:String = String::new();
-        if let (Some(_),Some(theme),None) = (arg1,arg2,arg3){
-            let with_theme:bool = theme.expect_bool()?;
-            let confirm= Self::with_custom_theme(with_theme,|theme| {
-            if let Some(theme) = theme {
-                Input::<String>::with_theme(theme).with_prompt(promps).interact_text()
-            } else {
-                Input::<String>::new().with_prompt(promps).interact_text()
-            }
-            });
-            result = confirm.unwrap();
-        } else if let (Some(_),None)= (arg1,arg2) {
-            result = Input::<String>::new().with_prompt(promps).interact().unwrap();
-        } 
-        Ok(result)
-    }
-
-    /// in php Dialoguer::confirm
-    fn confirm<'a>(arguments:&mut [ZVal])->Result<bool, phper::Error>
-    {
-        let promps:&str = arguments[0].expect_z_str()?.to_str()?;
-        let mut arg_list = arguments.iter();
-        let (arg1,arg2,arg3) = (arg_list.next(),arg_list.next(),arg_list.next());
-        let mut result:bool = false;
-        if let (Some(_),Some(theme),None) = (arg1,arg2,arg3){
-            let with_theme:bool = theme.expect_bool()?;
-            let test =Self::with_custom_theme(with_theme, |theme| {
-            if let Some(theme) = theme {
-                Confirm::with_theme(theme).with_prompt(promps).interact()
-            } else {
-                Confirm::new().with_prompt(promps).interact()
-            }
-            });
-            result = test.unwrap();
-        } else if let (Some(_),None)= (arg1,arg2) {
-            let confirm:Confirm<'static> = Confirm::new();
-            result = confirm.with_prompt(promps).interact().unwrap();
-        }
-        Ok(result)
-    }
 
     /// in php Dialoguer::select
     fn select(arguments:&mut [ZVal])->Result<String, phper::Error>
     {
-        let mut arg_list = arguments.iter();
-        let promps:&str = arguments[0].expect_z_str()?.to_str()?;
-        let (arg1,arg2,arg3,arg4) = (arg_list.next(),arg_list.next(),arg_list.next(),arg_list.next());
-        let vec:Vec<String> = Self::list_maker(&arguments[1])?;
-        let mut result:usize = 0;
-        if let (Some(_),Some(_),Some(theme),None) = (arg1,arg2,arg3,arg4){
-            let with_theme:bool = theme.expect_bool()?;
-            let select = Self::with_custom_theme(with_theme,|theme| {
+        Self::preformate_input_list_optionnal_theme(arguments, "select",
+        |input,list,theme|{
+            let result:usize;
+            let select:Select;
             if let Some(theme) = theme {
-                Select::with_theme(theme).with_prompt(promps).items(&vec).interact()
+                select = Select::with_theme(theme);
             } else {
-                Select::new().with_prompt(promps).items(&vec).interact()
+                select = Select::new();
             }
-            });
-            result = select.unwrap()
-        } else if let (Some(_),Some(_),None) = (arg1,arg2,arg3) {
-            result = Select::new().with_prompt(promps).items(&vec).interact().unwrap();
-        }
-        Ok(vec[result].clone())
+            result = select.with_prompt(input).items(&list).interact()?;
+            Ok(list[result].clone())
+        })
     }
 
 
     // // in php = Dialoguer::multiSelect
     fn multi_select(arguments:&mut [ZVal])->Result<ZArray, phper::Error>
     {
-        let promps:&str = arguments[0].expect_z_str()?.to_str()?;
-        let vec:Vec<String> = Self::list_maker(&arguments[1])?;
-        let mut stdout:Term = Term::stdout();
-        stdout.execute(crossterm::cursor::MoveTo(5,5)).unwrap();
-        stdout.write_line("[Space] select | [Enter] valid | [↑↓] navigate | [a] select all").unwrap();
-        let mut arg_list = arguments.iter();
-        let (arg1,arg2,arg3,arg4) = (arg_list.next(),arg_list.next(),arg_list.next(),arg_list.next());
-        let mut result:Vec<usize> = Vec::new();
-        if let (Some(_),Some(_),Some(theme),None) = (arg1,arg2,arg3,arg4) {
-            let with_theme:bool = theme.expect_bool()?;
-            let select = Self::with_custom_theme(with_theme,|theme| {
+        Self::preformate_input_list_optionnal_theme(arguments, "multiSelect",
+        |input,list,theme|{
+            let result:Vec<usize>;
+            let multi_select:MultiSelect;
             if let Some(theme) = theme {
-                MultiSelect::with_theme(theme).with_prompt(promps).items(&vec).interact_on(&stdout)
+                multi_select = MultiSelect::with_theme(theme);
             } else {
-                MultiSelect::new().with_prompt(promps).items(&vec).interact_on(&stdout)
+                multi_select = MultiSelect::new();
             }
-            });
-            result = select.unwrap()
-        } else if let (Some(_),Some(_),None) = (arg1,arg2,arg3) {
-            result = MultiSelect::new().with_prompt(promps).items(&vec).interact_on(&stdout).unwrap();
-        }
-
-        let arr:ZArray = Self::list_handler(result, vec);
-        Ok(arr) 
+            result = multi_select.with_prompt(input).items(&list).interact()?;
+            let z_array = Self::list_handler(result, list);
+            Ok(z_array)
+        })
     }
 
-    // in php = Dialoguer::password
-    fn password(arguments:&mut [ZVal])-> Result<(),phper::Error>
+    /// in php = Dialoguer::input
+    fn input(arguments:&mut [ZVal])->Result<String, phper::Error>
     {
-        let promps:&str = arguments[0].expect_z_str()?.to_str()?;
-        let mut arg_list = arguments.iter();
-        let (arg1,arg2,arg3) = (arg_list.next(),arg_list.next(),arg_list.next());
-        let mut result:String = String::new();
-        if let (Some(_),Some(theme),None) = (arg1,arg2,arg3) {
-            let with_theme:bool = theme.expect_bool()?;
-            let select = Self::with_custom_theme(with_theme,|theme| {
+        Self::preformate_input_optionnal_theme(arguments,"input" ,|prompt,theme|{
+            let input:Input<'_,String>;
             if let Some(theme) = theme {
-                Password::with_theme(theme)
-                .with_prompt(promps)
-                .with_confirmation("confirm password", "Passwords mismatching")
-                .interact()
+                input = Input::<String>::with_theme(theme);
             } else {
-                Password::new()
-                .with_prompt(promps)
-                .with_confirmation("confirm password", "Passwords mismatching")
-                .interact()
+                input = Input::<String>::new();
             }
-            });
-            result = select.unwrap()
-        } else if let (Some(_),Some(_),None) = (arg1,arg2,arg3) {
-            result = Password::new()
-            .with_prompt(promps)
-            .with_confirmation("confirm password", "Passwords mismatching")
-            .interact().unwrap();
-        }
-        dbg!(result);
-        Ok(())
+            let a = input.with_prompt(prompt).interact()?;
+            Ok(a)
+        })
     }
 
+    /// in php = Dialoguer::password
+    fn password(arguments:&mut [ZVal])-> Result<String,phper::Error>
+    {
+        Self::preformate_input_optionnal_theme(arguments, "password",|input,theme|{
+            let password:Password;
+            if let Some(theme) = theme {
+                password = Password::with_theme(theme);
+            } else {
+                password = Password::new();
+            }
+            let a = password.with_prompt(input)
+            .with_confirmation("confirm password", "Passwords mismatching")
+            .interact()?;
+            Ok(a)
+        })
+    }
 
+    /// in php Dialoguer::confirm
+    fn confirm(arguments:&mut [ZVal])->Result<bool, phper::Error>
+    {
+        Self::preformate_input_optionnal_theme(arguments, "confirm",|input,theme|{
+            let confirm:Confirm;
+            if let Some(theme) = theme {
+                confirm = Confirm::with_theme(theme);
+            } else {
+                confirm = Confirm::new();
+            }
+            let a = confirm.with_prompt(input).interact()?;
+            Ok(a)
+        })
+    }
+
+    /// in php Dialoguer::editor
     fn editor(arguments:&mut [ZVal])->Result<(),phper::Error>
     {
         let promps:&str = arguments[0].expect_z_str()?.to_str()?;
@@ -164,6 +110,70 @@ impl DialoguerBuilder<()> {
         }
         Ok(())
     }
+
+    fn error_mapper(error:impl std::error::Error+ 'static) -> phper::Error
+    {
+        phper::Error::Boxed(Box::new(error))
+    }
+
+    fn preformate_input_optionnal_theme<T: allow::AllowedForBoolAndString ,B>(arguments:&mut [ZVal],method_name:&str,builder:B) -> Result<T,phper::Error>
+        where 
+            B: FnOnce(&str,Option<&ColorfulTheme>)-> Result<T,dialoguer::Error>
+    {
+        let mut arg_list = arguments.iter();
+        let arguments_expected  = (arg_list.next(),arg_list.next(),arg_list.next());
+        if let (Some(input),None,None) = arguments_expected {
+            let input_arg = input.expect_z_str()?.to_str()?;
+            builder(input_arg,None)
+            .map_err(|x|{
+                Self::error_mapper(x)
+            })
+        } else if let (Some(input),Some(theme),None) = arguments_expected {
+            let  input_arg = input.expect_z_str()?.to_str()?;
+            let path_arg = theme.expect_bool()?;
+            if path_arg {
+                let theme:ColorfulTheme = ColorfulTheme::default();
+                builder(input_arg,Some(&theme)).map_err(|x|{
+                    Self::error_mapper(x)
+                })
+            } else {
+                builder(input_arg,None).map_err(|x|{
+                    Self::error_mapper(x)
+                })
+            }
+        } else {
+            Err(phper::Error::ArgumentCount(ArgumentCountError::new(String::from(method_name), 2, arguments.iter().len())))
+        }
+    }
+
+    fn preformate_input_list_optionnal_theme<T: allow::AllowedForZArrayAndString ,B>(arguments:&mut [ZVal],method_name:&str,builder:B) -> Result<T,phper::Error>
+        where 
+            B: FnOnce(&str,Vec<String>,Option<&ColorfulTheme>)-> Result<T,dialoguer::Error>
+    {
+        let mut arg_list = arguments.iter();
+        let promps:&str = arguments[0].expect_z_str()?.to_str()?;
+        let vec:Vec<String> = Self::list_maker(&arguments[1])?;
+        let (arg1,arg2,arg3,arg4) = (arg_list.next(),arg_list.next(),arg_list.next(),arg_list.next());
+        if let (Some(_),Some(_),Some(theme),None) = (arg1,arg2,arg3,arg4){
+            let path_arg = theme.expect_bool()?;
+            if path_arg {
+                let theme:ColorfulTheme = ColorfulTheme::default();
+                builder(promps,vec,Some(&theme)).map_err(|x|{
+                    Self::error_mapper(x)
+                })
+            } else {
+                builder(promps,vec,None).map_err(|x|{
+                    Self::error_mapper(x)
+                })
+            }
+        } else if let (Some(_),Some(_),None,None) = (arg1,arg2,arg3,arg4) {
+            builder(promps,vec,None).map_err(|x|{
+                    Self::error_mapper(x)
+            })
+        } else {
+            Err(phper::Error::ArgumentCount(ArgumentCountError::new(String::from(method_name), 2, arguments.iter().len())))
+        }
+    }  
 
     fn list_maker(z_value:&ZVal)->Result<Vec<String>, phper::Error>
     {
@@ -183,19 +193,6 @@ impl DialoguerBuilder<()> {
             arr.insert(i as u64, ZVal::from(values[i].clone()));
         }
         arr
-    }
-
-    
-    fn with_custom_theme<A,T>(with_theme:bool,builder: A) -> T
-    where 
-        A: FnOnce(Option<&ColorfulTheme>) -> T
-    {
-        if with_theme {
-            let theme:ColorfulTheme = ColorfulTheme::default();
-            builder(Some(&theme))
-        } else{ 
-            builder(None)
-        }
     }
 }
 

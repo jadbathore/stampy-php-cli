@@ -1,0 +1,3 @@
+Input<'_, string::String>
+std::string::String: From<Input<'_, std::string::String>>
+Input<'_, std::string::String>

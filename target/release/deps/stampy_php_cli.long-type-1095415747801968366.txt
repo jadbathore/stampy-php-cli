@@ -1,0 +1,1 @@
+(Vec<Result<DirEntry, std::io::Error>>, [&'a str])

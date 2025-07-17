@@ -1,7 +1,7 @@
 use phper::{modules::Module, php_get_module};
 
 use crate::{
-    mod_structs::builder::{class::DialoguerBuilder, director::Director, namespacehandler::NamespaceHandler}, 
+    mod_structs::{builder::{class::DialoguerBuilder, director::Director, namespacehandler::NamespaceHandler}, namespace_buf::ClassesInNamespace}, 
     mod_traits::builder::class::{BuilderClass, BuilderPropertyClass}
 };
 // use dialoguer::Password;
@@ -25,7 +25,7 @@ pub fn get_module() -> Module {
     let dialoguer_class = dialoguer_builder.build();
     module.add_class(dialoguer_class);
 
-    let mut namespacehandler_builder:NamespaceHandler<()> = NamespaceHandler::default();
+    let mut namespacehandler_builder:NamespaceHandler<ClassesInNamespace> = NamespaceHandler::default();
     Director::construct_namespacehandler(&mut namespacehandler_builder);
     let namespacehandler_class = namespacehandler_builder.build();
     module.add_class(namespacehandler_class);

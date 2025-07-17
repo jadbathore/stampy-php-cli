@@ -1,16 +1,16 @@
 
 use phper::{
-    arrays::{ZArr, ZArray}, classes::{ClassEntity,Visibility}, functions::{Argument,MethodEntity}, objects::{StateObj, ZObj}, types::ArgumentTypeHint, values::ZVal
+    arrays::{Iter, ZArr, ZArray}, classes::{ClassEntity,Visibility}, errors::ArgumentCountError, functions::{Argument,MethodEntity}, objects::{StateObj, ZObj}, strings::ZStr, types::ArgumentTypeHint, values::ZVal
 };
 
 use crate::
     {
-        mod_enums::arguments::ArgumentUsageNamespaceHandler, mod_structs::namespace_buf::{self, ClassesInNamespace}, mod_traits
+        mod_enums::arguments::{self, ArgumentUsageNamespaceHandler}, mod_structs::{builder, namespace_buf::{self, ClassesInNamespace}}, mod_traits::{self, builder::namespace}
     };
-use std::{ffi::OsStr, fs, io::Error, path::{self, PathBuf}};
+use core::slice;
+use std::{borrow::Cow, ffi::OsStr, fs, io::Error, ops::Deref, path::{self, PathBuf}};
 
 use mod_traits::builder::class::BuilderPropertyClass;
-
 
 
 #[derive(Default)]
@@ -19,53 +19,63 @@ pub struct NamespaceHandler<T:'static>
     class:Option<ClassEntity<T>>,
 }
 
-impl NamespaceHandler<()> {
+impl<'b> NamespaceHandler<ClassesInNamespace<'b>> 
+where 
+    'static:'b
+{
 
-    fn constructor(this:&mut StateObj<()>,arguments:&mut [ZVal])->Result<(),phper::Error>
+    fn constructor(this:&mut StateObj<ClassesInNamespace<'b>>,arguments:&mut [ZVal])->Result<(),phper::Error>
     {
-        let path_arg:&str = arguments[0].expect_z_str()?.to_str()?;
-        let namespace_arg:&str = arguments[1].expect_z_str()?.to_str()?;
-        let binding = namespace_arg.split("\\").map(OsStr::new).collect::<Vec<&OsStr>>();
-        let namespace_pointer = binding.as_slice();
-        let classes_in_namespace:ClassesInNamespace = ClassesInNamespace::from(namespace_pointer);
-        let mut path_buf = PathBuf::new();
-        path_buf.push(path_arg);
-        let mut z_array = ZArray::new();
-        classes_in_namespace.resolver(path_buf,&mut z_array);
-        this.set_property("classes",z_array);
-        this.set_property("namespace",namespace_arg);
-        Ok(())
+        Self::preformate_arguments(arguments,|path,namespace|{
+            let classes_in_namespace = this.as_mut_state();
+            let to_static_namespace = namespace.split("\\")
+            .map(|x| Self::leak_value(x.to_owned()))
+            .collect::<Vec<&'static str>>();
+            let to_static_path:&'static str = Self::leak_value(path.to_owned());
+            classes_in_namespace.extend_to_namespace(to_static_namespace.as_slice());
+            classes_in_namespace.push_to_path(to_static_path);
+            Ok(())
+        })
     }
 
-    fn get_associted_class<'a>(this:&mut StateObj<()>,_:&mut [ZVal])->Result<ZArray, phper::Error>
+    fn leak_value(str:String)->&'static str
     {
-        let a = this.get_property("classes").expect_z_arr()?.to_owned();
+        Box::leak(str.into_boxed_str())
+    }
+
+    fn preformate_arguments<B>(arguments:&mut [ZVal],builder:B) -> Result<(),phper::Error>
+        where 
+            B: FnOnce(&str,&str)-> Result<(),phper::Error>
+    {
+        let mut arg_list = arguments.iter();
+        let arguments_expected  = (arg_list.next(),arg_list.next(),arg_list.next());
+        if let (Some(path),Some(namespace),None) = arguments_expected {
+            let path_arg = path.expect_z_str()?.to_str()?;
+            let namespace_arg= namespace.expect_z_str()?.to_str()?;
+            builder(path_arg,namespace_arg)?;
+            Ok(())
+        } else {
+            Err(phper::Error::ArgumentCount(ArgumentCountError::new(String::from("__contructor"), 2, arguments.iter().len())))
+        }
+    }       
+
+    fn resolve(this:&mut StateObj<ClassesInNamespace<'b>>,_:&mut [ZVal])->Result<ZArray, phper::Error>
+    {
+        let class_in_namespace = this.as_mut_state();
+        let a = class_in_namespace.resolver()?;
         Ok(a)
     }
 
-    fn get_namespace<'a>(this:&mut StateObj<()>,_:&mut [ZVal])->Result<String, phper::Error>
+    fn previous(this:&mut StateObj<ClassesInNamespace<'b>>,_:&mut [ZVal])->Result<(), phper::Error>
     {
-        let a = this.get_property("namespace").expect_z_str()?.to_str()?;
-        Ok(a.to_owned())
+        this.as_mut_state().pop();
+        
+        Ok(())
     }
-
-    // fn add(this:&mut StateObj<()>,_:&mut [ZVal])->Result<ZArray, phper::Error>
-    // {
-    //     let a = this.get_property("namespace").expect_z_str()?.to_str()?;
-    //     namespace_buf.push(namespace);
-    // }
-
-    // fn pop(this:&mut StateObj<()>,_:&mut [ZVal])->Result<ZArray, phper::Error>
-    // {
-    //     let a = this.get_property("namespace").expect_z_str()?.to_str()?;
-    // }
-
-    
 }
 
-
-impl<T> NamespaceHandler<T> {
-    fn set_arguments(argument_usage:ArgumentUsageNamespaceHandler,method_entity:&mut MethodEntity){
+impl<'a,T> NamespaceHandler<T> {
+    fn set_arguments(argument_usage:ArgumentUsageNamespaceHandler,method_entity:&'a mut MethodEntity){
         match argument_usage {
             ArgumentUsageNamespaceHandler::PathWithNameSpace => {
                 method_entity.argument(Argument::new("path").with_type_hint(ArgumentTypeHint::String))
@@ -74,21 +84,24 @@ impl<T> NamespaceHandler<T> {
             
         }
     }
+
+    
     
 }
 
-impl BuilderPropertyClass for NamespaceHandler<()> 
+impl<'a> BuilderPropertyClass for NamespaceHandler<ClassesInNamespace<'a>> 
 {
-    type OutputType = ClassEntity<()>;
+    type OutputType = ClassEntity<ClassesInNamespace<'a>>;
 
     fn set_class(&mut self,class_name:&str) { 
-        self.class = Some(ClassEntity::new(class_name));
+        self.class = Some(ClassEntity::new_with_state_constructor(class_name, ClassesInNamespace::new));
     }
 
     fn set_property(&mut self) {
         if let Some(class) = &mut self.class {
-            class.add_property("classes", Visibility::Private, ());
+            class.add_property("path", Visibility::Private, ());
             class.add_property("namespace", Visibility::Private, ());
+            class.add_property("associatedNamespace", Visibility::Private, ());
         }
     }
 
@@ -98,8 +111,8 @@ impl BuilderPropertyClass for NamespaceHandler<()>
                 ArgumentUsageNamespaceHandler::PathWithNameSpace, 
                 class.add_method("__construct", Visibility::Public,Self::constructor)
             );
-            class.add_method("getAssocitedClass", Visibility::Public,Self::get_associted_class);
-            class.add_method("getNamespace", Visibility::Public,Self::get_namespace);
+            class.add_method("resolve", Visibility::Public,Self::resolve);
+            class.add_method("previous", Visibility::Public, Self::previous);
         }
     }
 

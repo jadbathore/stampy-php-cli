@@ -1,6 +1,21 @@
 <?php
 
 interface Dialoguer {
+    /**
+     * ## confirm 
+     * allow to add a confirm in the terminal 
+     *  
+     * ```php
+     *  $confirm = Dialoguer::confirm("are you sure ?");
+     *  // the terminal will as you "are you sure ?" 
+     *  // you pick true or false
+     *  if $confirm {
+     *      echo "ok"; // output true
+     *  } else {
+     *      echo "fortunately, we check"; // output false 
+     *  }
+     * ```
+     */
     public static function confirm(string $input,?Bool $theme=false):bool;
     public static function input(string $input,?Bool $theme=false):string;
     public static function password(string $input,?Bool $theme=false):void;

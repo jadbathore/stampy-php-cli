@@ -39,21 +39,4 @@ class ClassAttributHandler_CLI implements IteratorAggregate
     {
         return new AttributIterator_CLI($this, true);
     }
-
-    public function getDebbugingMethod():?methodCLIInterface
-    {
-        if(!isset($this->debuggingMethod))
-        {
-            $debuggingMethod = null;
-            foreach($this->getIterator() as $method_CLI)
-            {
-                if($method_CLI->getCommand() == 'debug')
-                {
-                    $debuggingMethod = $method_CLI;
-                }
-            }
-            $this->debuggingMethod = $debuggingMethod;
-        }
-        return $this->debuggingMethod;
-    }
 }

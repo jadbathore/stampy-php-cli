@@ -11,6 +11,7 @@ use IteratorIterator;
 class ControllerHandler_CLI implements \IteratorAggregate
 {
     private $items = [];
+    private ?methodCLIInterface $debuggingMethod;
 
     public function getItems()
     {
@@ -37,4 +38,38 @@ class ControllerHandler_CLI implements \IteratorAggregate
     {
         return new ControllerIterator($this, true);
     }
+
+    /**
+     * @return \Generator<TKey, MethodCLIInterface>| MethodCLIInterface[]
+     */
+    public function generateMethod():\Generator {
+        
+        foreach(new ControllerIterator($this) as $controller)
+        {
+            foreach($controller->getIterator() as $method_CLI)
+            {
+                yield $method_CLI;
+            }
+        }
+    }
+
+    public function getDebbugingMethod():?methodCLIInterface
+    {
+        if(!isset($this->debuggingMethod))
+        {
+            $debuggingMethod = null;
+            foreach($this->generateMethod() as $method_CLI)
+            {
+                if($method_CLI->getCommand() == 'debug')
+                {
+                    $debuggingMethod = $method_CLI;
+                    break;
+                }
+            }
+            $this->debuggingMethod = $debuggingMethod;
+        }
+        return $this->debuggingMethod;
+    }
+
+
 }

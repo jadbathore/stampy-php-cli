@@ -9,25 +9,28 @@ use App\Model\Class\Object\Option_CLI;
 
 class TestController extends AbstractPrompsController
 {
-
     #[
         Command('test2'),
         Option(
             [
-                '-test'=> new Option_CLI(true,"test option with input"),
-                '-b'=> new Option_CLI(false,"test option without input")
+                '-a'=> new Option_CLI(true,"test option with input"),
+                '-b'=> new Option_CLI(false,"test option without input"),
+                '-c'=> new Option_CLI(true,"test option with input"),
+                '-d'=> new Option_CLI(false,"test option without input")
             ])
         ,Description('Test function')
     ]
     public function test(
-        null|string|bool $test,
-        null|bool $b
-        ){
-            // Dialoguer::editor("bonjour :");
-            $this->color("test","green");
-    var_dump(get_declared_classes());
-
-            // dialoguer::confirm("blabla");
-        }
+        null|string|bool $a,
+        null|bool $b,
+        null|string|bool $c,
+        null|bool $d
+    ){
+        // Dialoguer::editor("bonjour :");
+        // $this->color("test","green");
+        var_dump(func_get_args());
+        
+        \Dialoguer::select("options ?",["a","b"]);
+    }
 
 }

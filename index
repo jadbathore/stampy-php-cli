@@ -2,30 +2,26 @@
 <?php 
 require_once 'vendor/autoload.php';
 
-// require_once './public/ModelAutoloader.php';
+// use App\Controller;
+// use App\Model\Class\ControllerHandler\BinControllerHandler;
+// use App\Model\Class\Singletone\ErrorHandler;
 
-use App\Controller;
-use App\Model\Class\ControllerHandler\BinControllerHandler;
-use App\Model\Class\Singletone\ErrorHandler;
-
-use function PHPSTORM_META\type;
-
-try{
-    $controllersNameSpace = new NamespaceHandler(__DIR__."/app",App\Controller::class);
-    $action = new BinControllerHandler($controllersNameSpace->getAssocitedClass(),$argv);
-    $action->start();
-}catch(Error $e){
-    $errorHandler = &ErrorHandler::instance($e);
-    $errorHandler->debugInfo();
-}
+// try{
+//     $controllersNameSpace = new \NamespaceHandler(__DIR__."/app",App\Controller::class);
+//     new BinControllerHandler($controllersNameSpace->getAssocitedClass(),$argv)->start();
+// }catch(Error $e){
+//     $errorHandler = &ErrorHandler::instance($e);
+//     $errorHandler->debugInfo();
+// }
 
 
-// var_dump(NamespaceHandler::getAssocitedClass(__DIR__."/app",App\Controller\BinController::class));
+$controllersNameSpace = new \NamespaceHandler(__DIR__."/app",App\Model\Abstract::class);
+var_dump($controllersNameSpace->resolve());
+$controllersNameSpace->previous();
+var_dump($controllersNameSpace->resolve());
 
 
-//     $action = new BinControllerHandler($controllersNameSpace->getAssocitedClass(),$argv);
 
-// $controllersNameSpace = new NamespaceHandler(__DIR__."/app",App\Controller::class);
-// var_dump($controllersNameSpace->getAssocitedClass());
-// var_dump($test->getNamespace());
-// $test.test();
+// use App\Controller;
+
+// var_dump(new \NamespaceHandler(__DIR__."/app",Controller::class));

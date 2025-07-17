@@ -7,3 +7,7 @@ pub enum ArgumentUsageDialoguer {
 pub enum ArgumentUsageNamespaceHandler {
     PathWithNameSpace,
 }
+
+pub enum NamespaceStateConstructor {
+    Slice,
+}

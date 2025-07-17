@@ -36,4 +36,6 @@ class RaisedmethodHandler_CLI implements IteratorAggregate
     {
         return new AttributIterator_CLI($this, true);
     }
+
+    
 }

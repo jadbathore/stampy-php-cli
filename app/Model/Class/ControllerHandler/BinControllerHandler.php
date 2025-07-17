@@ -23,6 +23,7 @@ class BinControllerHandler
     private RaisedmethodHandler_CLI $raisedMethodIterator;
     private Argv_CLI $argvObject;
     private ControllerHandler_CLI $controllerHandlerIterator;
+    private ?methodCLIInterface $debuggingMethod;
 
     public function __construct(
         private array $controllers,
@@ -53,6 +54,7 @@ class BinControllerHandler
                 }
             }
             $this->controllerHandlerIterator->addItem($classAtributHandlerIterator);
+            // var_dump($classAtributHandlerIterator);
         }
     }
 
@@ -69,10 +71,9 @@ class BinControllerHandler
 
     public function start():void
     {
-        foreach($this->controllerHandlerIterator->getIterator() as $controller)
+        foreach($this->controllerHandlerIterator->generateMethod() as $method_CLI)
         {
-            foreach($controller->getIterator() as $method_CLI){
-                if($method_CLI->getCommand() == $this->argvObject->getCurrent())
+            if($method_CLI->getCommand() == $this->argvObject->getCurrent())
                 {
                     $this->argvObject->next();
                     while($this->argvObject->isValid())
@@ -95,11 +96,9 @@ class BinControllerHandler
                         break 1;
                     }
                 }
-            }
         }
         $this->invokeAllRaisedMethod();
     }
-
 
     private function invokeAllRaisedMethod():void
     {
@@ -115,43 +114,23 @@ class BinControllerHandler
         }
     }
 
-    // /**
-    //  * @return \Generator<TKey, MethodCLIInterface>| MethodCLIInterface[]
-    //  */
-    // private function generateCommand():Generator {
-        
-    //     foreach($this->classAtributHandlerIterator->getIterator() as $method_CLI)
-    //     {
-    //         if($this->argvObject->currentArgvType($method_CLI) == Argv::Command){
-    //             yield $method_CLI;
-    //         }
-    //     }
-    // }
-
     private function defaultDebugScript(string $color = "green"):void
     {
-        foreach($this->controllerHandlerIterator as $controller)
-        {
-            foreach($controller->getIterator() as $method_CLI)
-            {
-                $this->color(str_repeat("=", 80)."\n",$color);
-                $method_CLI->method_debug_script($color);
-            }
+        foreach ($this->controllerHandlerIterator->generateMethod() as $method_CLI) {
             $this->color(str_repeat("=", 80)."\n",$color);
+            $method_CLI->method_debug_script($color);
         }
-        
+        $this->color(str_repeat("=", 80)."\n",$color);
     }
 
     private function invokeDebuggingMethod():void
     {
-        foreach($this->controllerHandlerIterator as $controller)
+        $nullableDebuggingMethod = $this->controllerHandlerIterator->getDebbugingMethod();
+        if (!is_null($nullableDebuggingMethod))
         {
-            if(!is_null($controller->getDebbugingMethod()))
-            {
-                $controller->getDebbugingMethod()->invoke($this->defaultDebugScript(...));
-            } else {
-                $this->defaultDebugScript();
-            }
+            $nullableDebuggingMethod->invoke($this->defaultDebugScript(...));
+        } else {
+            $this->defaultDebugScript();
         }
     }
 }

@@ -23,13 +23,10 @@ class BinController extends AbstractPrompsController
     public function test(
         null|string|bool $test,
         null|bool $b
-        ){
-            // Dialoguer::editor("bonjour :");
-            $this->color("test","green");
-    var_dump(get_declared_classes());
-
-            // dialoguer::confirm("blabla");
-        }
+    ){
+        $this->color("test","green");
+        var_dump(get_declared_classes());
+    }
 
     #[
         Command('debug'),
