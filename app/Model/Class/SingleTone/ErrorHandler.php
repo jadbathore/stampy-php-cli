@@ -2,6 +2,7 @@
 
 namespace App\Model\Class\Singletone;
 
+use App\Model\Class\throwable\binError;
 use App\Model\Interface\SingleToneInterface;
 use App\Model\Trait\Coloring;
 use Error;
@@ -11,8 +12,13 @@ class ErrorHandler implements SingleToneInterface {
     private static ?ErrorHandler $instance;
 
     private function __construct(
-        private ?Error $error=null,
+        private null|Error $error=null,
     ) {}
+
+    public function __destruct()
+    {
+        echo PHP_EOL;
+    }
     
     private function __clone()
     {}
@@ -64,7 +70,7 @@ class ErrorHandler implements SingleToneInterface {
     echo PHP_EOL;
     }
 
-    private function contextError():void {
+    protected function contextError():void {
         $i = 0;
         $this->color("Error context :",'green','bold');
         echo PHP_EOL;

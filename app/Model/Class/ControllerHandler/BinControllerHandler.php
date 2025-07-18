@@ -11,9 +11,12 @@ use App\Model\Class\IteratorAggregate\RaisedmethodHandler_CLI;
 use App\Model\Class\Object\Argv_CLI;
 use ReflectionClass;
 use App\Model\Class\Object\Method_CLI;
+use App\Model\Class\throwable\binError;
 use App\Model\Interface\MethodCLIInterface;
 use App\Model\Enum\Argv;
+use App\Model\Enum\Error as EnumError;
 use App\Model\Trait\Coloring;
+use Throwable;
 
 class BinControllerHandler
 {
@@ -42,6 +45,7 @@ class BinControllerHandler
 
     private function setAttributIterator()
     {
+        $tempDoubleCheck = [];
         foreach ($this->controllers as $controller) {
             $reflec_class = new ReflectionClass($controller);
             $classAtributHandlerIterator = new classAttributHandler_CLI($reflec_class);
@@ -50,11 +54,19 @@ class BinControllerHandler
                 if(!empty($method->getAttributes(Command::class)))
                 {
                     $methodHandler = new method_CLI($method);
-                    $classAtributHandlerIterator->addItem($methodHandler);
+                    if(!in_array($methodHandler->getCommand(),$tempDoubleCheck)) {
+                        $classAtributHandlerIterator->addItem($methodHandler);
+                        $tempDoubleCheck[] = $methodHandler->getCommand();
+                    } else {
+                        throw new binError(
+                            EnumError::DoubleCommand,
+                            $method,
+                            $this->controllerHandlerIterator->getmethod($methodHandler->getCommand()),
+                        );
+                    }
                 }
             }
             $this->controllerHandlerIterator->addItem($classAtributHandlerIterator);
-            // var_dump($classAtributHandlerIterator);
         }
     }
 

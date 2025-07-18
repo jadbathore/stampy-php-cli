@@ -1,16 +1,15 @@
 
 use phper::{
-    arrays::{Iter, ZArr, ZArray}, classes::{ClassEntity,Visibility}, errors::ArgumentCountError, functions::{Argument,MethodEntity}, objects::{StateObj, ZObj}, strings::ZStr, types::ArgumentTypeHint, values::ZVal
+    arrays::ZArray, classes::{ClassEntity,Visibility}, errors::ArgumentCountError, functions::{Argument,MethodEntity}, objects::StateObj, types::ArgumentTypeHint, values::ZVal
 };
 
 use crate::
     {
-        mod_enums::arguments::{self, ArgumentUsageNamespaceHandler}, mod_structs::{builder, namespace_buf::{self, ClassesInNamespace}}, mod_traits::{self, builder::namespace}
+        mod_enums::arguments::ArgumentUsageNamespaceHandler, mod_structs::namespace_buf::ClassesInNamespace, mod_traits
     };
-use core::slice;
-use std::{borrow::Cow, ffi::OsStr, fs, io::Error, ops::Deref, path::{self, PathBuf}};
 
-use mod_traits::builder::class::BuilderPropertyClass;
+
+use mod_traits::builder::class::BuilderClass;
 
 
 #[derive(Default)]
@@ -84,25 +83,14 @@ impl<'a,T> NamespaceHandler<T> {
             
         }
     }
-
-    
-    
 }
 
-impl<'a> BuilderPropertyClass for NamespaceHandler<ClassesInNamespace<'a>> 
+impl<'a> BuilderClass for NamespaceHandler<ClassesInNamespace<'a>> 
 {
     type OutputType = ClassEntity<ClassesInNamespace<'a>>;
 
     fn set_class(&mut self,class_name:&str) { 
         self.class = Some(ClassEntity::new_with_state_constructor(class_name, ClassesInNamespace::new));
-    }
-
-    fn set_property(&mut self) {
-        if let Some(class) = &mut self.class {
-            class.add_property("path", Visibility::Private, ());
-            class.add_property("namespace", Visibility::Private, ());
-            class.add_property("associatedNamespace", Visibility::Private, ());
-        }
     }
 
     fn set_methods(&mut self) {

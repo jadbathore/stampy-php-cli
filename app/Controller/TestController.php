@@ -10,7 +10,7 @@ use App\Model\Class\Object\Option_CLI;
 class TestController extends AbstractPrompsController
 {
     #[
-        Command('test2'),
+        Command('test'),
         Option(
             [
                 '-a'=> new Option_CLI(true,"test option with input"),

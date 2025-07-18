@@ -11,7 +11,7 @@ pub struct ClassesInNamespace<'a>
 
 impl  ClassesInNamespace<'_> {
 
-    fn a(index:usize,entry:&mut DirEntry,self_clone:&mut ClassesInNamespace<'_>,classes_reciever:&mut ZArray)->Result<(), io::Error>
+    fn resolve_callback(index:usize,entry:&mut DirEntry,self_clone:&mut ClassesInNamespace<'_>,classes_reciever:&mut ZArray)->Result<(), io::Error>
     {
         let mut sub_path:PathBuf = entry.path();
         sub_path.set_extension("");
@@ -85,7 +85,7 @@ impl<'b>  ClassesInNamespace<'b>
 
     pub fn resolver<'a>(&mut self)->Result<ZArray,io::Error>
     {
-        let a = self.resolve(Self::a)?;
+        let a = self.resolve(Self::resolve_callback)?;
         Ok(a)
     }
 
@@ -96,6 +96,7 @@ impl<'b>  ClassesInNamespace<'b>
         A:for<'a> Fn(usize,&mut DirEntry,&mut ClassesInNamespace<'a>,&mut ZArray) -> Result<(),io::Error>,
     {
         let mut z_array = ZArray::new();
+
         for i in 0..self.items.len() {
             let mut path_buf:PathBuf = self.path.clone();
             path_buf.push(self.items[i]);
@@ -108,6 +109,12 @@ impl<'b>  ClassesInNamespace<'b>
                 } 
                 break;
             }
+        }
+        if z_array.is_empty() {
+            let mut iterable = self.dir_entry(&self.path.clone())?;
+            for (i,value) in iterable.iter_mut().enumerate() {
+                builder(i,value,&mut self.clone(),&mut z_array)?;
+            } 
         }
         Ok(z_array)
     }

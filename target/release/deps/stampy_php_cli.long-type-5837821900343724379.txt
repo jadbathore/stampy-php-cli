@@ -1,0 +1,3 @@
+for<'a, 'b> fn(&'a mut {type error}, &'b mut [ZVal]) -> Result<(), phper::errors::Error> {IndicatifBuilder::<ProgressBar>::constructor}
+Scalar: From<for<'a, 'b> fn(&'a mut {type error}, &'b mut [ZVal]) -> Result<(), phper::Error> {IndicatifBuilder::<ProgressBar>::constructor}>
+for<'a, 'b> fn(&'a mut {type error}, &'b mut [ZVal]) -> Result<(), phper::Error> {IndicatifBuilder::<ProgressBar>::constructor}

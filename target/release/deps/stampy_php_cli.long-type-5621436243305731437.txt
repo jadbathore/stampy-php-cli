@@ -1,0 +1,2 @@
+fn(u64) -> ProgressBar {ProgressBar::new}
+std::string::String: From<fn(u64) -> ProgressBar {ProgressBar::new}>

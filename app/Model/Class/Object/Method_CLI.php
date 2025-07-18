@@ -151,4 +151,14 @@ class Method_CLI implements MethodCLIInterface {
         $explodeClass = explode("\\",$class);
         return $explodeClass[count($explodeClass)-1];
     }
+
+    public function getLine():int|false
+    {
+        return $this->method->getStartLine();
+    }
+
+    public function getFile():string|false
+    {
+        return $this->method->getFileName();
+    }
 }

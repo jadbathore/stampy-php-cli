@@ -1,8 +1,9 @@
+use indicatif::ProgressBar;
 use phper::{modules::Module, php_get_module};
 
 use crate::{
-    mod_structs::{builder::{class::DialoguerBuilder, director::Director, namespacehandler::NamespaceHandler}, namespace_buf::ClassesInNamespace}, 
-    mod_traits::builder::class::{BuilderClass, BuilderPropertyClass}
+    mod_structs::{builder::{class::DialoguerBuilder, director::Director, indicatif::IndicatifBuilder, namespacehandler::NamespaceHandler}, namespace_buf::ClassesInNamespace}, 
+    mod_traits::builder::class::BuilderClass
 };
 // use dialoguer::Password;
 
@@ -21,14 +22,18 @@ pub fn get_module() -> Module {
     );
 
     let mut dialoguer_builder:DialoguerBuilder<()> = DialoguerBuilder::default();
-    Director::construct_dialoguer(&mut dialoguer_builder);
+    Director::construct_builder_class(&mut dialoguer_builder,"Dialoguer");
     let dialoguer_class = dialoguer_builder.build();
     module.add_class(dialoguer_class);
 
     let mut namespacehandler_builder:NamespaceHandler<ClassesInNamespace> = NamespaceHandler::default();
-    Director::construct_namespacehandler(&mut namespacehandler_builder);
+    Director::construct_builder_class(&mut namespacehandler_builder,"NamespaceHandler");
     let namespacehandler_class = namespacehandler_builder.build();
     module.add_class(namespacehandler_class);
 
+    let mut namespacehandler_builder:IndicatifBuilder = IndicatifBuilder::default();
+    Director::construct_builder_class(&mut namespacehandler_builder,"Indicatif");
+    let namespacehandler_class = namespacehandler_builder.build();
+    module.add_class(namespacehandler_class);
     module
 }

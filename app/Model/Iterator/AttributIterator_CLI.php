@@ -41,4 +41,5 @@ class AttributIterator_CLI implements \Iterator
     {
         return isset($this->collection->getItems()[$this->index]);
     }
+    
 }

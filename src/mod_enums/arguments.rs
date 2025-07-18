@@ -11,3 +11,7 @@ pub enum ArgumentUsageNamespaceHandler {
 pub enum NamespaceStateConstructor {
     Slice,
 }
+
+pub enum ArgumentUsageProgressBar {
+    
+}

@@ -53,6 +53,21 @@ class ControllerHandler_CLI implements \IteratorAggregate
         }
     }
 
+    public function getmethod(String $commandName):?MethodCLIInterface
+    {
+        /**
+         * @return \Traversable<TKey, MethodCLIInterface>|MethodCLIInterface[]
+         */
+        $test = function() use ($commandName):\Generator{
+            foreach($this->generateMethod() as $method){
+                if ($commandName == $method->getCommand()){
+                    yield $method;
+                }
+            }
+        };
+        return $test()->current();
+    }
+
     public function getDebbugingMethod():?methodCLIInterface
     {
         if(!isset($this->debuggingMethod))

@@ -39,4 +39,27 @@ class ClassAttributHandler_CLI implements IteratorAggregate
     {
         return new AttributIterator_CLI($this, true);
     }
+
+    /**
+     * @return \Traversable<TKey, MethodCLIInterface>|MethodCLIInterface[]
+     */
+    private function getGeneratedMethod(String $className):\Generator
+    {
+        var_dump($this->items);
+        foreach($this->getIterator() as $method){
+            var_dump($method);
+            if ($className == $method->getName()){
+                yield $method;
+                // break;
+            }
+        }
+    }
+
+    public function getmethod(String $className):?MethodCLIInterface
+    {
+        foreach($this->getGeneratedMethod($className)as $a){
+            var_dump($a);
+        }
+        return null;
+    }
 }

@@ -5,23 +5,18 @@ require_once 'vendor/autoload.php';
 // use App\Controller;
 // use App\Model\Class\ControllerHandler\BinControllerHandler;
 // use App\Model\Class\Singletone\ErrorHandler;
+// use App\Model\Class\Singletone\BinErrorHandler;
+// use App\Model\Class\throwable\binError;
 
 // try{
 //     $controllersNameSpace = new \NamespaceHandler(__DIR__."/app",App\Controller::class);
-//     new BinControllerHandler($controllersNameSpace->getAssocitedClass(),$argv)->start();
-// }catch(Error $e){
+//     new BinControllerHandler($controllersNameSpace->resolve(),$argv)->start();
+// } catch(Error $e) {
 //     $errorHandler = &ErrorHandler::instance($e);
 //     $errorHandler->debugInfo();
+// } catch(binError $e) {
+//     $errorHandler = &BinErrorHandler::instance($e);
+//     $errorHandler->correction();
 // }
 
-
-$controllersNameSpace = new \NamespaceHandler(__DIR__."/app",App\Model\Abstract::class);
-var_dump($controllersNameSpace->resolve());
-$controllersNameSpace->previous();
-var_dump($controllersNameSpace->resolve());
-
-
-
-// use App\Controller;
-
-// var_dump(new \NamespaceHandler(__DIR__."/app",Controller::class));
+$a = new Indicatif();

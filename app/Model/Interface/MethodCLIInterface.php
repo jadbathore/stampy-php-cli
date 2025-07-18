@@ -13,4 +13,6 @@ interface MethodCLIInterface {
     public function invoke():void;
     public function getDescription():null|string;
     public function method_debug_script(string $color):void;
+    public function getLine():int|false;
+    public function getFile():string|false;
 }
