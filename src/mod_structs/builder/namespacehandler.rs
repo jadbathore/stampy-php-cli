@@ -5,7 +5,7 @@ use phper::{
 
 use crate::
     {
-        mod_enums::arguments::ArgumentUsageNamespaceHandler, mod_structs::namespace_buf::ClassesInNamespace, mod_traits
+        general, mod_enums::arguments::ArgumentUsageNamespaceHandler, mod_structs::namespace_buf::ClassesInNamespace, mod_traits
     };
 
 
@@ -28,18 +28,13 @@ where
         Self::preformate_arguments(arguments,|path,namespace|{
             let classes_in_namespace = this.as_mut_state();
             let to_static_namespace = namespace.split("\\")
-            .map(|x| Self::leak_value(x.to_owned()))
+            .map(|x| general::leak_value(x.to_owned()))
             .collect::<Vec<&'static str>>();
-            let to_static_path:&'static str = Self::leak_value(path.to_owned());
+            let to_static_path:&'static str = general::leak_value(path.to_owned());
             classes_in_namespace.extend_to_namespace(to_static_namespace.as_slice());
             classes_in_namespace.push_to_path(to_static_path);
             Ok(())
         })
-    }
-
-    fn leak_value(str:String)->&'static str
-    {
-        Box::leak(str.into_boxed_str())
     }
 
     fn preformate_arguments<B>(arguments:&mut [ZVal],builder:B) -> Result<(),phper::Error>

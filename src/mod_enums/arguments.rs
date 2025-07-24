@@ -13,5 +13,7 @@ pub enum NamespaceStateConstructor {
 }
 
 pub enum ArgumentUsageProgressBar {
-    
+    Length,
+    OptionalIncrementation,
+    Message
 }

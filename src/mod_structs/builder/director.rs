@@ -1,15 +1,14 @@
-use crate::mod_traits::builder::class::{BuilderClass,BuilderPropertyClass};
+use crate::mod_traits::builder::class::{BuilderClass,BuilderWrapper};
 
 pub struct Director;
 
 impl Director {
-    pub fn construct_builder_class(builder: &mut impl BuilderClass,className:&str){
-        builder.set_class(className);
+    pub fn construct_builder_class(builder: &mut impl BuilderClass,class_name:&str){
+        builder.set_class(class_name);
         builder.set_methods();
     }
 
-    // pub fn construct_namespacehandler(builder: &mut impl BuilderClass){
-    //     builder.set_class("NameSpaceHandler");
-    //     builder.set_methods();
-    // }
+    pub fn construct_wrapper(builder: &mut impl BuilderWrapper){
+        builder.set_item();
+    }
 }

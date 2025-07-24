@@ -13,3 +13,10 @@ pub trait BuilderPropertyClass {
     fn set_property(&mut self);
     fn build(self) -> Self::OutputType;
 }
+
+pub trait BuilderWrapper {
+    type OutputType;
+    type InputType;
+    fn set_item(&mut self);
+    fn build(self) -> Self::OutputType;
+}

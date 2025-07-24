@@ -5,12 +5,12 @@ use App\Model\Attributes\Command;
 use App\Model\Attributes\Description;
 use App\Model\Attributes\Option;
 use App\Model\Class\Object\Option_CLI;
-
+use Indicatif;
 
 class TestController extends AbstractPrompsController
 {
     #[
-        Command('test'),
+        Command('test1'),
         Option(
             [
                 '-a'=> new Option_CLI(true,"test option with input"),
@@ -27,10 +27,16 @@ class TestController extends AbstractPrompsController
         null|bool $d
     ){
         // Dialoguer::editor("bonjour :");
-        // $this->color("test","green");
-        var_dump(func_get_args());
-        
-        \Dialoguer::select("options ?",["a","b"]);
+        $this->color("test\n","green");
+        $progressBar = $this->newProgressBar(100);
+        for($i=0;$i<100;$i++){
+            $progressBar->increment();
+            if($i == 3){
+                unset($progressBar);
+                break;
+            }
+            sleep(1);
+        }
     }
 
 }

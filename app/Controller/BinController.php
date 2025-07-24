@@ -10,7 +10,6 @@ use Dialoguer;
 
 class BinController extends AbstractPrompsController
 {
-
     #[
         Command('test'),
         Option(

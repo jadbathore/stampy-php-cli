@@ -1,17 +1,13 @@
-use indicatif::ProgressBar;
 use phper::{modules::Module, php_get_module};
-
-use crate::{
-    mod_structs::{builder::{class::DialoguerBuilder, director::Director, indicatif::IndicatifBuilder, namespacehandler::NamespaceHandler}, namespace_buf::ClassesInNamespace}, 
-    mod_traits::builder::class::BuilderClass
-};
-// use dialoguer::Password;
 
 pub mod mod_enums;
 pub mod mod_structs;
 pub mod mod_traits;
-
-
+pub mod general;
+use crate::{
+    mod_structs::{builder::{class::DialoguerBuilder, director::Director, indicatif::ProgressBarBuilder, namespacehandler::NamespaceHandler}, namespace_buf::ClassesInNamespace}, 
+    mod_traits::builder::class::BuilderClass
+};
 
 #[php_get_module]
 pub fn get_module() -> Module {
@@ -31,7 +27,7 @@ pub fn get_module() -> Module {
     let namespacehandler_class = namespacehandler_builder.build();
     module.add_class(namespacehandler_class);
 
-    let mut namespacehandler_builder:IndicatifBuilder = IndicatifBuilder::default();
+    let mut namespacehandler_builder:ProgressBarBuilder = ProgressBarBuilder::default();
     Director::construct_builder_class(&mut namespacehandler_builder,"Indicatif");
     let namespacehandler_class = namespacehandler_builder.build();
     module.add_class(namespacehandler_class);

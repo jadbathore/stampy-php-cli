@@ -14,7 +14,7 @@
         }
     ],
     "scripts":{
-        "bin":["sudo ./bin"],
+        "bin":["./bin"],
         "test":["php test.php"]
     }
 }
