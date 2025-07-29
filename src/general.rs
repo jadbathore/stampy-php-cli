@@ -8,8 +8,8 @@ pub fn leak_value(str:String)->&'static str
 pub fn format_throwable_error(message:&str)-> Result<ThrowObject,phper::Error>
 {
     let z_val = ZVal::from(message);
-    let std_class = ClassEntry::from_globals("Error")?;
-    let zobj = std_class.new_object([z_val])?;
+    let error_class = ClassEntry::from_globals("Error")?;
+    let zobj = error_class.new_object([z_val])?;
     let mapped_err = ThrowObject::new(zobj)
     .map_err(|e| phper::Error::NotImplementThrowable(e));
     mapped_err

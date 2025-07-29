@@ -1,6 +1,11 @@
+
+
+
 use std::{ffi::{OsStr}, fs::{self, DirEntry}, io, path::PathBuf};
 use std::borrow::Cow;
 use phper::arrays::{ZArray};
+
+use crate::passthrough;
 
 #[derive(Default,Clone)]
 pub struct ClassesInNamespace<'a>
@@ -9,7 +14,7 @@ pub struct ClassesInNamespace<'a>
     path:PathBuf
 }
 
-impl  ClassesInNamespace<'_> {
+impl ClassesInNamespace<'_> {
 
     fn resolve_callback(index:usize,entry:&mut DirEntry,self_clone:&mut ClassesInNamespace<'_>,classes_reciever:&mut ZArray)->Result<(), io::Error>
     {
@@ -24,6 +29,11 @@ impl  ClassesInNamespace<'_> {
             }
         }
         Ok(()) 
+    }
+
+    fn check_for_similarity(_:usize,entry:&mut DirEntry,self_clone:&mut ClassesInNamespace<'_>,class:&mut ZArray)->Result<(), io::Error>
+    {
+        Ok(())
     }
 
 
@@ -85,38 +95,51 @@ impl<'b>  ClassesInNamespace<'b>
 
     pub fn resolver<'a>(&mut self)->Result<ZArray,io::Error>
     {
-        let a = self.resolve(Self::resolve_callback)?;
+        let a = self.clone().resolve(Self::resolve_callback)?;
         Ok(a)
     }
 
-    
-
-    fn resolve<A>(&mut self,builder:A) -> Result<ZArray,io::Error>
-    where 
-        A:for<'a> Fn(usize,&mut DirEntry,&mut ClassesInNamespace<'a>,&mut ZArray) -> Result<(),io::Error>,
+    fn get_starting_path(&mut self)->Option<(usize,PathBuf)>
     {
-        let mut z_array = ZArray::new();
-
+        passthrough!(init Item<(usize,PathBuf)> as path_through);
         for i in 0..self.items.len() {
             let mut path_buf:PathBuf = self.path.clone();
             path_buf.push(self.items[i]);
             if path_buf.exists() {
-                let rests = &self.items[i+1..];
-                path_buf.extend(rests);
-                let mut iterable = self.dir_entry(&path_buf)?;
-                for (i,value) in iterable.iter_mut().enumerate() {
-                    builder(i,value,&mut self.clone(),&mut z_array)?;
-                } 
+                passthrough!(set path_through = (i+1,path_buf));
                 break;
             }
         }
-        if z_array.is_empty() {
-            let mut iterable = self.dir_entry(&self.path.clone())?;
-            for (i,value) in iterable.iter_mut().enumerate() {
-                builder(i,value,&mut self.clone(),&mut z_array)?;
-            } 
+        passthrough!(get path_through)
+    }
+
+
+
+
+    fn resolve<A>(mut self,builder:A) -> Result<ZArray,io::Error>
+    where 
+        A:for<'a> Fn(usize,&mut DirEntry,&mut ClassesInNamespace<'a>,&mut ZArray) -> Result<(),io::Error>,
+    {
+        let mut z_array = ZArray::new();
+        if let Some((start_slice,mut path_buf)) = self.get_starting_path() {
+            let rests = &self.items[start_slice..];
+            path_buf.extend(rests);
+            self.default_z_array(path_buf,&mut z_array, builder)?;
+        } else {
+            self.default_z_array(self.path.clone(),&mut z_array, builder)?;
         }
         Ok(z_array)
+    }
+
+    fn default_z_array<A>(&mut self,path:PathBuf,z_array:&mut ZArray,builder:A)-> Result<(),io::Error>
+    where 
+        A:for<'a> Fn(usize,&mut DirEntry,&mut ClassesInNamespace<'a>,&mut ZArray) -> Result<(),io::Error>,
+    {
+        let mut iterable = self.dir_entry(&path)?;
+        for (i,value) in iterable.iter_mut().enumerate() {
+            builder(i, value,&mut self.clone(), z_array)?;
+        }
+        Ok(())
     }
 
     fn dir_entry<'a>(&mut self,path_buf:& PathBuf) -> Result<Vec<DirEntry>,io::Error>

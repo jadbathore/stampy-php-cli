@@ -4,6 +4,7 @@ pub mod mod_enums;
 pub mod mod_structs;
 pub mod mod_traits;
 pub mod general;
+pub mod general_macro;
 use crate::{
     mod_structs::{builder::{class::DialoguerBuilder, director::Director, indicatif::ProgressBarBuilder, namespacehandler::NamespaceHandler}, namespace_buf::ClassesInNamespace}, 
     mod_traits::builder::class::BuilderClass

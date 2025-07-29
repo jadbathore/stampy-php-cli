@@ -6,6 +6,7 @@ pub enum ArgumentUsageDialoguer {
 
 pub enum ArgumentUsageNamespaceHandler {
     PathWithNameSpace,
+    NamespaceSlice,
 }
 
 pub enum NamespaceStateConstructor {
@@ -17,3 +18,4 @@ pub enum ArgumentUsageProgressBar {
     OptionalIncrementation,
     Message
 }
+

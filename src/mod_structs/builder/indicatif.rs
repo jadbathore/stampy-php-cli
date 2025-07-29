@@ -109,6 +109,8 @@ impl ProgressBarBuilder {
         }
     }
 
+    
+
     fn convert_to_unsigned(length: i64,argument_type:ArgumentUsageProgressBar)-> Result<u64,ThrowObject>
     {
         u64::try_from(length)

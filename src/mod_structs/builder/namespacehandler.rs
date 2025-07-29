@@ -37,21 +37,7 @@ where
         })
     }
 
-    fn preformate_arguments<B>(arguments:&mut [ZVal],builder:B) -> Result<(),phper::Error>
-        where 
-            B: FnOnce(&str,&str)-> Result<(),phper::Error>
-    {
-        let mut arg_list = arguments.iter();
-        let arguments_expected  = (arg_list.next(),arg_list.next(),arg_list.next());
-        if let (Some(path),Some(namespace),None) = arguments_expected {
-            let path_arg = path.expect_z_str()?.to_str()?;
-            let namespace_arg= namespace.expect_z_str()?.to_str()?;
-            builder(path_arg,namespace_arg)?;
-            Ok(())
-        } else {
-            Err(phper::Error::ArgumentCount(ArgumentCountError::new(String::from("__contructor"), 2, arguments.iter().len())))
-        }
-    }       
+     
 
     fn resolve(this:&mut StateObj<ClassesInNamespace<'b>>,_:&mut [ZVal])->Result<ZArray, phper::Error>
     {
@@ -66,6 +52,29 @@ where
         
         Ok(())
     }
+
+    fn add(this:&mut StateObj<ClassesInNamespace<'b>>,_:&mut [ZVal])->Result<(), phper::Error>
+    {
+        this.as_mut_state().pop();
+        
+        Ok(())
+    }
+
+    fn preformate_arguments<B>(arguments:&mut [ZVal],builder:B) -> Result<(),phper::Error>
+    where 
+        B: FnOnce(&str,&str)-> Result<(),phper::Error>
+    {
+        let mut arg_list = arguments.iter();
+        let arguments_expected  = (arg_list.next(),arg_list.next(),arg_list.next());
+        if let (Some(path),Some(namespace),None) = arguments_expected {
+            let path_arg = path.expect_z_str()?.to_str()?;
+            let namespace_arg= namespace.expect_z_str()?.to_str()?;
+            builder(path_arg,namespace_arg)?;
+            Ok(())
+        } else {
+            Err(phper::Error::ArgumentCount(ArgumentCountError::new(String::from("__contructor"), 2, arguments.iter().len())))
+        }
+    }  
 }
 
 impl<'a,T> NamespaceHandler<T> {
@@ -74,6 +83,9 @@ impl<'a,T> NamespaceHandler<T> {
             ArgumentUsageNamespaceHandler::PathWithNameSpace => {
                 method_entity.argument(Argument::new("path").with_type_hint(ArgumentTypeHint::String))
                 .argument(Argument::new("namespace").with_type_hint(ArgumentTypeHint::String));
+            },
+            ArgumentUsageNamespaceHandler::NamespaceSlice => {
+                method_entity.argument(Argument::new("namespaceSlice").with_type_hint(ArgumentTypeHint::String));
             }
             
         }
