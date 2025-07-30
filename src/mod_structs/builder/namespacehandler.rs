@@ -1,4 +1,6 @@
 
+use std::ffi::OsString;
+
 use phper::{
     arrays::ZArray, classes::{ClassEntity,Visibility}, errors::ArgumentCountError, functions::{Argument,MethodEntity}, objects::StateObj, types::ArgumentTypeHint, values::ZVal
 };
@@ -37,8 +39,6 @@ where
         })
     }
 
-     
-
     fn resolve(this:&mut StateObj<ClassesInNamespace<'b>>,_:&mut [ZVal])->Result<ZArray, phper::Error>
     {
         let class_in_namespace = this.as_mut_state();
@@ -53,11 +53,22 @@ where
         Ok(())
     }
 
-    fn add(this:&mut StateObj<ClassesInNamespace<'b>>,_:&mut [ZVal])->Result<(), phper::Error>
+    fn push(this:&mut StateObj<ClassesInNamespace<'b>>,arguments:&mut [ZVal])->Result<(), phper::Error>
     {
-        this.as_mut_state().pop();
-        
-        Ok(())
+        let state_class = this.as_mut_state();
+        Self::preformate_namespace_slice(arguments, |namespace_slice|{
+
+            if state_class.try_push(&namespace_slice)? {
+                let leak_namespace = general::leak_value(namespace_slice.to_string_lossy().to_string());
+                state_class.push_to_namespace(leak_namespace);
+            Ok(())
+            } else {
+                let format_message = ["namespace ",&state_class.get_namespace(),"\\",namespace_slice.to_str().unwrap()," don't exist"];
+                let throwable = general::format_throwable_error(&format_message.join(""))?;
+                Err(phper::Error::Throw(throwable))
+            }
+        })
+
     }
 
     fn preformate_arguments<B>(arguments:&mut [ZVal],builder:B) -> Result<(),phper::Error>
@@ -73,6 +84,21 @@ where
             Ok(())
         } else {
             Err(phper::Error::ArgumentCount(ArgumentCountError::new(String::from("__contructor"), 2, arguments.iter().len())))
+        }
+    }  
+
+    fn preformate_namespace_slice<B>(arguments:&mut [ZVal],builder:B) -> Result<(),phper::Error>
+    where 
+        B: FnOnce(OsString)-> Result<(),phper::Error>
+    {
+        let mut arg_list = arguments.iter();
+        let arguments_expected  = (arg_list.next(),arg_list.next());
+        if let (Some(path),None) = arguments_expected {
+            let path_arg = path.expect_z_str()?.to_str()?;
+            builder(OsString::from(path_arg))?;
+            Ok(())
+        } else {
+            Err(phper::Error::ArgumentCount(ArgumentCountError::new(String::from("push"), 2, arguments.iter().len())))
         }
     }  
 }
@@ -108,6 +134,7 @@ impl<'a> BuilderClass for NamespaceHandler<ClassesInNamespace<'a>>
             );
             class.add_method("resolve", Visibility::Public,Self::resolve);
             class.add_method("previous", Visibility::Public, Self::previous);
+            class.add_method("push", Visibility::Public, Self::push);
         }
     }
 

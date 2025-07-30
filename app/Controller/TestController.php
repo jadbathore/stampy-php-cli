@@ -5,7 +5,6 @@ use App\Model\Attributes\Command;
 use App\Model\Attributes\Description;
 use App\Model\Attributes\Option;
 use App\Model\Class\Object\Option_CLI;
-use Indicatif;
 
 class TestController extends AbstractPrompsController
 {
@@ -26,17 +25,15 @@ class TestController extends AbstractPrompsController
         null|string|bool $c,
         null|bool $d
     ){
-        // Dialoguer::editor("bonjour :");
-        $this->color("test\n","green");
-        $progressBar = $this->newProgressBar(100);
-        for($i=0;$i<100;$i++){
-            $progressBar->increment();
-            if($i == 3){
-                unset($progressBar);
-                break;
-            }
-            sleep(1);
-        }
+        $controllersNameSpace = new \NamespaceHandler(dirname(__DIR__,2)."/app",\App\Model::class);
+        var_dump($controllersNameSpace->resolve());
+        $controllersNameSpace->push("Abstract");
+        var_dump($controllersNameSpace->resolve());
+        $controllersNameSpace->previous();
+        var_dump($controllersNameSpace->resolve());
+        $controllersNameSpace->push("Enum");
+        var_dump($controllersNameSpace->resolve());
+
     }
 
 }
