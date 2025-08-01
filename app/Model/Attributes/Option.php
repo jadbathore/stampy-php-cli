@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Model\Attributes;
+namespace Stampy\Model\Attributes;
 
-use App\Model\Class\Object\Option_CLI;
+use Stampy\Model\Class\Object\Option_CLI;
 use Attribute;
 
 #[Attribute(self::TARGET_METHOD)]

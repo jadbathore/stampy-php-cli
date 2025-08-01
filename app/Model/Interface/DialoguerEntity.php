@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Interface;
+namespace Stampy\Model\Interface;
 
 interface Dialoguer {
     public static function confirm(string $input,?Bool $theme=false);

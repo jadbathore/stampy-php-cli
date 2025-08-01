@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Model\Interface;
+namespace Stampy\Model\Interface;
 
-use App\Model\Enum\Argv;
+use Stampy\Model\Enum\Argv;
 
 interface ArgvInterface {
     public function getCurrent():string;

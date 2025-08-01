@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Model\Class\Object;
+namespace Stampy\Model\Class\Object;
 
-use App\Model\Attributes\Command;
-use App\Model\Attributes\Description;
-use App\Model\Attributes\Option;
-use App\Model\trait\Coloring;
-use App\Model\Interface\MethodCLIInterface;
-use App\Model\Class\Object\Option_CLI;
+use Stampy\Model\Attributes\Command;
+use Stampy\Model\Attributes\Description;
+use Stampy\Model\Attributes\Option;
+use Stampy\Model\trait\Coloring;
+use Stampy\Model\Interface\MethodCLIInterface;
+use Stampy\Model\Class\Object\Option_CLI;
 use \ReflectionMethod;
 
 class Method_CLI implements MethodCLIInterface {

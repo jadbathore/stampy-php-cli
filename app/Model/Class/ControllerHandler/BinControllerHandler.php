@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Model\Class\ControllerHandler;
+namespace Stampy\Model\Class\ControllerHandler;
 
 use \Error;
 use \Generator;
-use App\Model\Class\IteratorAggregate\ClassAttributHandler_CLI;
-use App\Model\Attributes\Command;
-use App\Model\Class\IteratorAggregate\ControllerHandler_CLI;
-use App\Model\Class\IteratorAggregate\RaisedmethodHandler_CLI;
-use App\Model\Class\Object\Argv_CLI;
+use Stampy\Model\Class\IteratorAggregate\ClassAttributHandler_CLI;
+use Stampy\Model\Attributes\Command;
+use Stampy\Model\Class\IteratorAggregate\ControllerHandler_CLI;
+use Stampy\Model\Class\IteratorAggregate\RaisedmethodHandler_CLI;
+use Stampy\Model\Class\Object\Argv_CLI;
 use ReflectionClass;
-use App\Model\Class\Object\Method_CLI;
-use App\Model\Class\throwable\binError;
-use App\Model\Interface\MethodCLIInterface;
-use App\Model\Enum\Argv;
-use App\Model\Enum\Error as EnumError;
-use App\Model\Trait\Coloring;
+use Stampy\Model\Class\Object\Method_CLI;
+use Stampy\Model\Class\throwable\binError;
+use Stampy\Model\Interface\MethodCLIInterface;
+use Stampy\Model\Enum\Argv;
+use Stampy\Model\Enum\Error as EnumError;
+use Stampy\Model\Trait\Coloring;
 use Throwable;
 
 class BinControllerHandler

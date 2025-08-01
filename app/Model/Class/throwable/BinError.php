@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Model\Class\throwable;
+namespace Stampy\Model\Class\throwable;
 
-use App\Model\Class\Object\Method_CLI;
-use App\Model\Enum\Error;
-use App\Model\Interface\MethodCLIInterface;
+use Stampy\Model\Class\Object\Method_CLI;
+use Stampy\Model\Enum\Error;
+use Stampy\Model\Interface\MethodCLIInterface;
 use Exception;
 use ReflectionMethod;
 use Throwable;

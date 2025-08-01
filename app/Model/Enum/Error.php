@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Enum;
+namespace Stampy\Model\Enum;
 
 enum Error
 {

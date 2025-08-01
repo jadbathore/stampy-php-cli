@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Model\Class\IteratorAggregate;
+namespace Stampy\Model\Class\IteratorAggregate;
 
-use App\Model\Iterator\ControllerIterator;
-use App\Model\Class\IteratorAggregate\ClassAttributHandler_CLI;
+use Stampy\Model\Iterator\ControllerIterator;
+use Stampy\Model\Class\IteratorAggregate\ClassAttributHandler_CLI;
 use \IteratorAggregate;
-use App\Model\Interface\MethodCLIInterface;
+use Stampy\Model\Interface\MethodCLIInterface;
 use IteratorIterator;
 
 class ControllerHandler_CLI implements \IteratorAggregate

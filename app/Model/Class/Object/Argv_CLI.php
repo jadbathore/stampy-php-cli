@@ -1,10 +1,10 @@
 <?php
 
-namespace App\model\class\Object;
+namespace Stampy\model\class\Object;
 
-use App\Model\Enum\Argv;
-use App\Model\Interface\ArgvInterface;
-use App\Model\Interface\MethodCLIInterface;
+use Stampy\Model\Enum\Argv;
+use Stampy\Model\Interface\ArgvInterface;
+use Stampy\Model\Interface\MethodCLIInterface;
 
 class Argv_CLI implements ArgvInterface {
 

@@ -1,12 +1,12 @@
 <?php
-namespace App\Controller;
+namespace Stampy\Controller;
 
-use App\Model\Abstract\AbstractPrompsController;
-use App\Model\Attributes\Command;
-use App\Model\Attributes\Description;
-use App\Model\Attributes\Option;
-use App\Model\Class\Object\Option_CLI;
-use Dialoguer;
+use Stampy\Model\Abstract\AbstractPrompsController;
+use Stampy\Model\Attributes\Command;
+use Stampy\Model\Attributes\Description;
+use Stampy\Model\Attributes\Option;
+use Stampy\Model\Class\Object\Option_CLI;
+use \Dialoguer;
 
 class BinController extends AbstractPrompsController
 {
@@ -23,8 +23,7 @@ class BinController extends AbstractPrompsController
         null|string|bool $test,
         null|bool $b
     ){
-        $this->color("test","green");
-        var_dump(get_declared_classes());
+ 
     }
 
     #[

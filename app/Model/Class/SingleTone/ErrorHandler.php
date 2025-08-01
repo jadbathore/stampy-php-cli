@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Model\Class\Singletone;
+namespace Stampy\Model\Class\Singletone;
 
-use App\Model\Class\throwable\binError;
-use App\Model\Interface\SingleToneInterface;
-use App\Model\Trait\Coloring;
+use Stampy\Model\Class\throwable\binError;
+use Stampy\Model\Interface\SingleToneInterface;
+use Stampy\Model\Trait\Coloring;
 use Error;
 
 class ErrorHandler implements SingleToneInterface {

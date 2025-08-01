@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Model\Trait;
+namespace Stampy\Model\Trait;
 
-use App\Model\Enum\Text;
+use Stampy\Model\Enum\Text;
 
 trait Coloring
 {

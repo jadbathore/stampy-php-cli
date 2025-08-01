@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Interface;
+namespace Stampy\Model\Interface;
 
 interface MethodCLIInterface {
     public function getOptions(): null|array;

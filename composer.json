@@ -4,17 +4,25 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-            "Stampy\\PhpCli\\": "src/",
-            "App\\":"app/"
+            "Stampy\\":"app/"
         }
     },
     "authors": [
         {
-            "name": "jad"
+            "name": "jadbathore"
         }
     ],
+    "require": {
+        "php": ">=8.4",
+        "ext-ffi": "*"
+    },
+
     "scripts":{
-        "bin":["./bin"],
-        "test":["php test.php"]
+        "post-install-cmd": [
+            "./init/install"
+        ],
+        "post-update-cmd": [
+            "./init/install"
+        ]
     }
 }

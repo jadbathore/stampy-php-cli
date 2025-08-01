@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Model\Enum;
+namespace Stampy\Model\Enum;
 
 use Error;
-use App\Model\Interface\ColorInterface;
+use Stampy\Model\Interface\ColorInterface;
 
 enum Text:string implements ColorInterface
 {

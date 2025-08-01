@@ -1,0 +1,14 @@
+#!/bin/bash
+
+
+php -d extension=target/release/libstampy_php_cli.dylib init/install.php < ../test/composer.json > init/local.env
+# php -d extension=target/release/libstampy_php_cli.dylib -f init/installEnv.php < ../test/composer.json > local.env
+# cd ../test;
+# mkdir -p console;
+# cp ../php-cli/index console/bin;
+# mkdir -p Controller;
+# cp -r ../php-cli/app/Controller/ Controller/ ;
+# php -f ../php-cli/init/env.php < composer.json > .env;
+# php -f ../php-cli/init/create_bin.php < composer.json > bin;
+# chmod 755 bin;
+

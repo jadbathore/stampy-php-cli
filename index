@@ -1,14 +1,15 @@
 #!/usr/bin/env php
-<?php 
+<?php
 require_once 'vendor/autoload.php';
 
-use App\Model\Class\ControllerHandler\BinControllerHandler;
-use App\Model\Class\Singletone\ErrorHandler;
-use App\Model\Class\Singletone\BinErrorHandler;
-use App\Model\Class\throwable\binError;
+use Stampy\Model\Class\ControllerHandler\BinControllerHandler;
+use Stampy\Model\Class\Singletone\ErrorHandler;
+use Stampy\Model\Class\Singletone\BinErrorHandler;
+use Stampy\Model\Class\throwable\binError;
+
 
 try{
-    $controllersNameSpace = new \NamespaceHandler(__DIR__."/app",App\Controller::class);
+    $controllersNameSpace = new \NamespaceHandler(__DIR__.getenv("ENTRY"),getenv("NAMESPACE"));
     new BinControllerHandler($controllersNameSpace->resolve(),$argv)->start();
 } catch(Error $e) {
     $errorHandler = &ErrorHandler::instance($e);

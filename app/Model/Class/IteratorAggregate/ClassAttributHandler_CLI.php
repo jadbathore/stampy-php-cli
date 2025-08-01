@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Model\Class\IteratorAggregate;
+namespace Stampy\Model\Class\IteratorAggregate;
 
-use App\Model\Iterator\AttributIterator_CLI;
+use Stampy\Model\Iterator\AttributIterator_CLI;
 use \IteratorAggregate;
-use App\Model\Interface\MethodCLIInterface;
+use Stampy\Model\Interface\MethodCLIInterface;
 
 class ClassAttributHandler_CLI implements IteratorAggregate
 {

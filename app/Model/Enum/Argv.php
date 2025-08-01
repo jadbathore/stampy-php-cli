@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Model\Enum;
+namespace Stampy\Model\Enum;
 
-use App\Model\Interface\ArgvInterface;
-use App\Model\Interface\MethodCLIInterface;
-use App\Model\class\Object\Option_CLI;
+use Stampy\Model\Interface\ArgvInterface;
+use Stampy\Model\Interface\MethodCLIInterface;
+use Stampy\Model\class\Object\Option_CLI;
 
 enum Argv:string 
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Attributes;
+namespace Stampy\Model\Attributes;
 
 use Attribute;
 
