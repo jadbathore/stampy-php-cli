@@ -3,14 +3,18 @@
 require_once 'vendor/autoload.php';
 
 use Stampy\Model\Class\ControllerHandler\BinControllerHandler;
+use Stampy\Model\Class\ControllerHandler\JumpStart;
 use Stampy\Model\Class\Singletone\ErrorHandler;
 use Stampy\Model\Class\Singletone\BinErrorHandler;
 use Stampy\Model\Class\throwable\binError;
 
-
 try{
-    $controllersNameSpace = new \NamespaceHandler(__DIR__.getenv("ENTRY"),getenv("NAMESPACE"));
-    new BinControllerHandler($controllersNameSpace->resolve(),$argv)->start();
+    if(getenv("CLASS") && getenv("METHOD")){
+        new JumpStart(getenv("CLASS"),getenv("METHOD"),$argv)->start();
+    } else {
+        $controllersNameSpace = new \NamespaceHandler(__DIR__.getenv("ENTRY"),getenv("NAMESPACE"));
+        new BinControllerHandler($controllersNameSpace->resolve(),$argv)->start();
+    }
 } catch(Error $e) {
     $errorHandler = &ErrorHandler::instance($e);
     $errorHandler->debugInfo();

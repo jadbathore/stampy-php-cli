@@ -1,0 +1,24 @@
+ARG BUILDPLATFORM
+
+FROM --platform=$BUILDPLATFORM rust:latest 
+
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    php \
+    php-cli \
+    php-dev \
+    unzip \
+    pkg-config \
+    libssl-dev \
+    libclang-dev \
+    ca-certificates \
+    && apt-get clean
+
+COPY . /app 
+
+RUN cd app && cargo build --release
+
+
+

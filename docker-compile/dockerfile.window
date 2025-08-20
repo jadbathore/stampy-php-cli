@@ -1,0 +1,46 @@
+FROM php-8.4.11-devel-ubuntu:latest AS php-win
+
+ARG BUILDPLATFORM
+
+FROM --platform=$BUILDPLATFORM rust:latest AS build
+
+COPY . /php-cli 
+
+RUN apt update && apt install -y \ 
+    build-essential \
+    curl \
+    gcc-mingw-w64-x86-64 \
+    mount \
+    sudo \
+    # g++-mingw-w64-x86-64 \
+    binutils-mingw-w64-x86-64 \
+    php-cli \
+    php-dev \
+    clang \
+    llvm \
+    libclang-dev \
+    mingw-w64 \
+    pkg-config 
+
+
+# RUN sudo mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc
+# RUN $ curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+
+
+# RUN mkdir root/.cargo
+
+# RUN echo '[target.x86_64-pc-windows-gnu]' > root/.cargo/config && \
+# echo 'linker = "/usr/bin/x86_64-w64-mingw32-gcc"'>> root/.cargo/config && \
+# echo 'ar = "/usr/x86_64-w64-mingw32/bin/ar"'>> root/.cargo/config 
+
+
+ARG TARGET
+# RUN rustup default stable
+RUN rustup target add ${TARGET}
+RUN cargo install cross
+
+RUN rustup toolchain install stable-${TARGET} --force-non-host
+COPY --from=php-win php-8.4.11-devels/ php-cli/php-header/
+
+
+RUN cd php-cli  && PHP_INCLUDE="php-header/include" cross build --release --target=${TARGET} --force-non-host

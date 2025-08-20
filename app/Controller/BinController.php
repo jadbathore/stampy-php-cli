@@ -7,6 +7,9 @@ use Stampy\Model\Attributes\Description;
 use Stampy\Model\Attributes\Option;
 use Stampy\Model\Class\Object\Option_CLI;
 use \Dialoguer;
+use Stampy\Model\Attributes\StdErr;
+use Stampy\Model\Attributes\StdIn;
+use Stampy\Model\Attributes\StdOut;
 
 class BinController extends AbstractPrompsController
 {
@@ -17,13 +20,13 @@ class BinController extends AbstractPrompsController
                 '-test'=> new Option_CLI(true,"test option with input"),
                 '-b'=> new Option_CLI(false,"test option without input")
             ])
-        ,Description('Test function')
+        ,Description('Test function'),
     ]
     public function test(
         null|string|bool $test,
         null|bool $b
     ){
- 
+        echo "hello";
     }
 
     #[

@@ -3,28 +3,26 @@
 namespace Stampy\Model\Class\ControllerHandler;
 
 use \Error;
-use \Generator;
 use Stampy\Model\Class\IteratorAggregate\ClassAttributHandler_CLI;
 use Stampy\Model\Attributes\Command;
 use Stampy\Model\Class\IteratorAggregate\ControllerHandler_CLI;
 use Stampy\Model\Class\IteratorAggregate\RaisedmethodHandler_CLI;
 use Stampy\Model\Class\Object\Argv_CLI;
 use ReflectionClass;
+use Stampy\Model\Abstract\abstractControllerHandler;
+use Stampy\Model\Abstract\abstractPrompsController;
 use Stampy\Model\Class\Object\Method_CLI;
 use Stampy\Model\Class\throwable\binError;
 use Stampy\Model\Interface\MethodCLIInterface;
 use Stampy\Model\Enum\Argv;
 use Stampy\Model\Enum\Error as EnumError;
 use Stampy\Model\Trait\Coloring;
-use Throwable;
 
-class BinControllerHandler
+class BinControllerHandler extends AbstractControllerHandler
 {
     use Coloring;
 
-    // private ClassAttributHandler_CLI $classAtributHandlerIterator;
     private RaisedmethodHandler_CLI $raisedMethodIterator;
-    private Argv_CLI $argvObject;
     private ControllerHandler_CLI $controllerHandlerIterator;
     private ?methodCLIInterface $debuggingMethod;
 
@@ -42,6 +40,7 @@ class BinControllerHandler
             $this->invokeDebuggingMethod();
         }
     }
+
 
     private function setAttributIterator()
     {
@@ -75,39 +74,55 @@ class BinControllerHandler
         $this->raisedMethodIterator = new raisedmethodHandler_CLI();
     }
 
-    private function argvSetter(array $argv)
+    protected function argvSetter(array $argv)
     {
-
         $this->argvObject = new argv_CLI((count($argv)<=1)?$argv:array_slice($argv,1));
     }
+
+    protected function populateMethod(Method_CLI $method_CLI)
+    {
+        while($this->argvObject->isValid())
+        {
+            switch($this->argvObject->currentArgvType($method_CLI))
+            {
+                case Argv::Option:
+                    $method_CLI->addPromps($this->argvObject->getCurrent(),true);
+                break;
+                case Argv::Input:
+                    $method_CLI->addPromps($this->argvObject->getLast(),$this->argvObject->getCurrent());
+                break;
+                default: throw new Error("unknown Option '".$this->argvObject->getCurrent()."'");
+            } 
+            $this->argvObject->next();
+        } 
+    }
+
 
     public function start():void
     {
         foreach($this->controllerHandlerIterator->generateMethod() as $method_CLI)
         {
             if($method_CLI->getCommand() == $this->argvObject->getCurrent())
-                {
-                    $this->argvObject->next();
-                    while($this->argvObject->isValid())
-                    {
-                        switch($this->argvObject->currentArgvType($method_CLI))
-                        {
-                            case Argv::Option:
-                                $method_CLI->addPromps($this->argvObject->getCurrent(),true);
-                            break;
-                            case Argv::Input:
-                                $method_CLI->addPromps($this->argvObject->getLast(),$this->argvObject->getCurrent());
-                            break;
-                            default: throw new Error("unknown Option '".$this->argvObject->getCurrent()."'");
-                        } 
-                        $this->argvObject->next();
-                    } 
-                    $this->raisedMethodIterator->addItem($method_CLI);
-                    if(!$this->argvObject->isValid())
-                    {
-                        break 1;
-                    }
+            {
+                if($method_CLI->useSTD()){
+                    echo implode(" ",[
+                    "EXIT",
+                    $method_CLI->getClass(),
+                    $method_CLI->getName(), 
+                    $method_CLI->getStdErr() ?? "#",
+                    $method_CLI->getStdIn() ?? "#",
+                    $method_CLI->getStdOut()?? "#" 
+                    ]);
+                    die;
                 }
+                $this->argvObject->next();
+                $this->populateMethod($method_CLI);
+                $this->raisedMethodIterator->addItem($method_CLI);
+                if(!$this->argvObject->isValid())
+                {
+                    break 1;
+                }
+            }
         }
         $this->invokeAllRaisedMethod();
     }
@@ -119,7 +134,6 @@ class BinControllerHandler
             foreach($this->raisedMethodIterator->getIterator() as $raisedMethod)
             {
                 $raisedMethod->invokeFromPromps();
-
             } 
         } else {
             $this->invokeDebuggingMethod();

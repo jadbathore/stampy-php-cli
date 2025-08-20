@@ -15,4 +15,8 @@ interface MethodCLIInterface {
     public function method_debug_script(string $color):void;
     public function getLine():int|false;
     public function getFile():string|false;
+    public function useSTD():bool;
+    public function getStdErr():?string; 
+    public function getStdOut():?string; 
+    public function getStdIn():?string; 
 }

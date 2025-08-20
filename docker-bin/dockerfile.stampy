@@ -1,0 +1,66 @@
+ARG BUILDPLATFORM
+
+FROM debian:latest
+
+FROM --platform=$BUILDPLATFORM rust:latest 
+
+RUN apt-get update && apt-get install -y \
+    php \
+    php-cli \
+    php-dev 
+
+
+COPY ./php-cli/init ./
+COPY ./php-cli/src ./rust/src
+COPY ./php-cli/Cargo.toml ./rust
+COPY ./php-cli/build.rs ./rust
+
+ARG ENTRY
+
+
+RUN php create_index.php > index;
+RUN ENTRY="${ENTRY}" php create_bin.php > stampy;
+RUN cd rust && cargo build --release;
+
+#14 [stage-1 10/11] RUN ls -l ;
+#14 0.136 total 100
+#14 0.136 lrwxrwxrwx   1 root root    7 May 12 19:25 bin -> usr/bin
+#14 0.136 drwxr-xr-x   2 root root 4096 May 12 19:25 boot
+#14 0.136 -rw-r--r--   1 root root 1168 Aug 20 13:35 composer-getter.php
+#14 0.136 -rw-r--r--   1 root root 1112 Aug 20 15:40 create_bin.php
+#14 0.136 -rw-r--r--   1 root root 1639 Aug  8 14:53 create_controller.php
+#14 0.136 -rw-r--r--   1 root root  956 Aug  8 14:19 create_index.php
+#14 0.136 drwxr-xr-x   5 root root  340 Aug 20 16:50 dev
+#14 0.136 drwxr-xr-x   1 root root 4096 Aug 20 16:50 etc
+#14 0.136 drwxr-xr-x   2 root root 4096 May 12 19:25 home
+#14 0.136 -rw-r--r--   1 root root  813 Aug 20 16:50 index
+#14 0.136 -rwxr-xr-x   1 root root 2938 Aug 20 16:32 install
+#14 0.136 -rw-r--r--   1 root root 2940 Aug 20 15:17 install.php
+#14 0.136 lrwxrwxrwx   1 root root    7 May 12 19:25 lib -> usr/lib
+#14 0.136 drwxr-xr-x   2 root root 4096 Aug 11 00:00 media
+#14 0.136 drwxr-xr-x   2 root root 4096 Aug 11 00:00 mnt
+#14 0.136 drwxr-xr-x   2 root root 4096 Aug 11 00:00 opt
+#14 0.136 -rw-r--r--   1 root root 1120 Aug 20 13:22 preCompileOption.php
+#14 0.136 dr-xr-xr-x 217 root root    0 Aug 20 16:50 proc
+#14 0.136 drwx------   2 root root 4096 Aug 11 00:00 root
+#14 0.136 drwxr-xr-x   1 root root 4096 Aug 20 16:29 run
+#14 0.136 drwxr-xr-x   1 root root 4096 Aug 20 16:50 rust
+#14 0.136 lrwxrwxrwx   1 root root    8 May 12 19:25 sbin -> usr/sbin
+#14 0.136 drwxr-xr-x   2 root root 4096 Aug 11 00:00 srv
+#14 0.136 -rw-r--r--   1 root root  721 Aug 20 16:50 stampy
+#14 0.136 dr-xr-xr-x  11 root root    0 Aug 20 16:32 sys
+#14 0.136 drwxrwxrwt   1 root root 4096 Aug 20 16:50 tmp
+#14 0.136 drwxr-xr-x   1 root root 4096 Aug 11 00:00 usr
+#14 0.136 drwxr-xr-x   1 root root 4096 Aug 20 16:29 var
+#14 DONE 0.1s
+
+#15 [stage-1 11/11] RUN cd rust && ls -l ;
+#15 0.123 total 32
+#15 0.123 -rw-r--r-- 1 root root 13979 Aug 20 16:50 Cargo.lock
+#15 0.123 -rw-r--r-- 1 root root   242 Aug 18 14:30 Cargo.toml
+#15 0.123 -rw-r--r-- 1 root root   788 Aug 18 14:40 build.rs
+#15 0.123 drwxr-xr-x 5 root root  4096 Jul 28 13:33 src
+#15 0.123 drwxr-xr-x 3 root root  4096 Aug 20 16:50 target
+
+# --env-file .env
+# CMD ["tail", "-f", "/dev/null"]

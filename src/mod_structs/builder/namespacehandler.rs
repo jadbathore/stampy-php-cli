@@ -49,7 +49,6 @@ where
     fn previous(this:&mut StateObj<ClassesInNamespace<'b>>,_:&mut [ZVal])->Result<(), phper::Error>
     {
         this.as_mut_state().pop();
-        
         Ok(())
     }
 

@@ -1,1 +1,1 @@
-/Users/jadbathore/Documents/coding/codding_rust/stampy/php-cli/target/release/stampy-php-cli: /Users/jadbathore/Documents/coding/codding_rust/stampy/php-cli/build.rs /Users/jadbathore/Documents/coding/codding_rust/stampy/php-cli/src/main.rs
+/Users/jadbathore/Documents/coding/codding_rust/stampy-all/stampy/php-cli/target/release/stampy-php-cli: /Users/jadbathore/Documents/coding/codding_rust/stampy-all/stampy/php-cli/build.rs /Users/jadbathore/Documents/coding/codding_rust/stampy-all/stampy/php-cli/src/main.rs

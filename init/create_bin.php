@@ -1,19 +1,41 @@
 <?php
-$stream = json_decode(stream_get_contents(STDIN));
-$entry = dirname(__DIR__,2)."/test/console/bin";
+$entry = getenv("ENTRY")."bin";
 
 echo implode("\n",[
     "#!/bin/bash",
-    "export $(grep -v '^#' .env | xargs)",
-    ' ext="extension=vendor/stampy/php-cli/target/release/libstampy_php_cli.dylib" ',
+    "export $(grep -v '^#' .env )",
+    'ext="extension='.getenv("EXT").'"',
     "if [ $# -eq 0 ]; then",
     "\t".'php -d $ext ' . $entry,
     "\texit 1",
     'fi',
-    'args=""',
-    'for arg in "$@";do',
-    "\t".' args="$args $arg"',
-    'done',
-    'php -d $ext '. $entry . ' $args'
+    "implode() {",
+    "\tlocal sep=".'"$1"'."; shift",
+    "\tlocal arr=(".'"$@"'.")",
+    "\tlocal IFS=".'"$sep"',
+    "\techo".'"$*"',
+    '}',
+    "stdphp()",
+    "{",
+    "\t".'local class="$1";',
+    "\t".'local method="$2";',
+    "\t".'local ERR="$3";',
+    "\t".'local IN="$4";',
+    "\t".'local rest=(${@:7});',
+    "\t".'ERR=$([[ "$3" != "#" ]] && echo "2> $3");',
+    "\t".'IN=$([[ "$4" != "#" ]] && echo "< $4");',
+    "\t".'OUT=$([[ "$5" != "#" ]] && echo "> $5");',
+    "\t".'eval "CLASS=\"$class\" METHOD=\"$method\" php -d $ext index $(implode " " ${rest[@]}) $IN $OUT $ERR"',
+    '}',
+    'args=$(implode " " "$@");',
+    'result=$(php -d $ext ' . $entry .' $args)',
+    'if echo $result | grep -q "EXIT"; then',
+    "\t".'arr=($result)',
+    "\t".'stdphp ${arr[@]:1} $args',
+    "\t".'exit 1;',
+    "else",
+    "\t".'echo "$result";',
+    "fi"
 ]);
+
 

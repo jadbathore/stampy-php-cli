@@ -2,6 +2,7 @@
 
 namespace Stampy\Model\Class\Object;
 
+use ReflectionAttribute;
 use Stampy\Model\Attributes\Command;
 use Stampy\Model\Attributes\Description;
 use Stampy\Model\Attributes\Option;
@@ -9,6 +10,9 @@ use Stampy\Model\trait\Coloring;
 use Stampy\Model\Interface\MethodCLIInterface;
 use Stampy\Model\Class\Object\Option_CLI;
 use \ReflectionMethod;
+use Stampy\Model\Attributes\StdErr;
+use Stampy\Model\Attributes\StdIn;
+use Stampy\Model\Attributes\StdOut;
 
 class Method_CLI implements MethodCLIInterface {
 
@@ -19,6 +23,9 @@ class Method_CLI implements MethodCLIInterface {
     private ?string $description;
     private string $command;
     private object $invokable;
+    private ?string $stdIn;
+    private ?string $stdOut;
+    private ?string $stdErr;
 
     public function __construct(private ReflectionMethod $method)
     {
@@ -27,6 +34,15 @@ class Method_CLI implements MethodCLIInterface {
         $this->setDescription();
         $this->setInvokable();
         $this->setPromps();
+        $this->set_STDERR();
+        $this->set_STDIN();
+        $this->set_STDOUT();
+    }
+
+    public function useSTD(): bool
+    {
+        $s = $this->stdErr ?? $this->stdIn ?? $this->stdOut;
+        return !is_null($s);
     }
 
     private function setOptions():void
@@ -37,6 +53,19 @@ class Method_CLI implements MethodCLIInterface {
             $this->addOptions($attribute->getArguments()[0]);
         }
     }
+
+    private function set_STDIN():void{
+        $this->stdIn = ($attrStdIn = current($this->method->getAttributes(StdIn::class)))? $attrStdIn->getArguments()[0] : null;
+    }
+
+    private function set_STDERR():void{
+        $this->stdErr = ($attrStdErr = current($this->method->getAttributes(StdErr::class)))? $attrStdErr->getArguments()[0] : null;
+    }
+
+    private function set_STDOUT():void{
+        $this->stdOut = ($attrStdOut = current($this->method->getAttributes(StdOut::class)))? $attrStdOut->getArguments()[0] : null;
+    }
+
     private function setCommand():void
     {
         $attributes_Command = current($this->method->getAttributes(Command::class))->getArguments()[0];
@@ -106,25 +135,35 @@ class Method_CLI implements MethodCLIInterface {
 
     public function invokeFromPromps(): void
     {
-        if(is_null($this->getPromps()))
-        {
-            $this->method->invoke($this->invokable,$this->getPromps());
-        } else {
-            $this->method->invoke($this->invokable,...array_values($this->getPromps()));
-        }
+        $args = (is_null($this->getPromps()))?
+                $this->getPromps():
+                array_values($this->getPromps());
+        $this->method->invoke($this->invokable,...$args);
     }
+
+
 
     public function invoke(mixed ...$argument): void
     {
         $this->method->invoke($this->invokable,...$argument);
     }
 
+    private function toDisplay(?string $attr):?string{
+        switch($attr){
+            case Command::class:
+            case Option::class:
+            case Description::class:
+                return null;
+            default: return "";
+        }
+    }  
+
     public function method_debug_script(string $color):void 
     {
         foreach($this->method->getAttributes() as $attribut)
         {
-            $basename_attribut = $this->getBaseName($attribut->getName());
-            $this->color($basename_attribut.":",$color,"underline","bold");
+            $this->toDisplay($attribut->getName())??
+            $this->color($this->getBaseName($attribut->getName()).":",$color,"underline","bold");
             switch($attribut->getName())
             {
                 case Command::class:
@@ -134,16 +173,14 @@ class Method_CLI implements MethodCLIInterface {
                     foreach ($this->getOptions() as $key => $value) {
                         if ($value instanceof Option_CLI){
                             $this->color("\n\t<$key>: {$value->getDescription()}",$color,"italic");
-                        } else {
-                        
-                        }
+                        } 
                     }
                 break;
                 case Description::class:
                     $this->color($this->getDescription(),$color,"italic");
                 break;
             }
-            echo PHP_EOL;
+            echo $this->toDisplay($attribut->getName()) ?? PHP_EOL;
         }
     }
     private function getBaseName(string $class):string
@@ -160,5 +197,20 @@ class Method_CLI implements MethodCLIInterface {
     public function getFile():string|false
     {
         return $this->method->getFileName();
+    }
+
+    public function getStdErr():?string 
+    {
+        return $this->stdErr;
+    }
+
+    public function getStdIn():?string 
+    {
+        return $this->stdIn;
+    }
+
+    public function getStdOut():?string 
+    {
+        return $this->stdOut;
     }
 }

@@ -1,0 +1,13 @@
+version: latest
+services:
+  bin:
+    container_name: stampy-bin
+    build:
+      context: .
+      dockerfile: dockerfile.virtual.bin
+      platforms:
+        - linux/arm64
+    env_file: .env
+    volumes:
+      - .${ENTRY}:/app/console
+      - ./Cargo.toml:/app/Cargo.toml

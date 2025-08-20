@@ -23,6 +23,11 @@ class Argv_CLI implements ArgvInterface {
         return ($this->isValid())?$this->argv[$this->index]:$this->argv[$this->length -1];
     }
 
+    public function addtoInput(string $input):void
+    {
+        $this->argv[] = $input;
+    }
+
     public function isValid():bool
     {
         return isset($this->argv[$this->index]);

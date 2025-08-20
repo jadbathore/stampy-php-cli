@@ -1,14 +1,106 @@
 #!/bin/bash
 
+system_finder(){
+    local ARCH=$(uname -m)
+    local OS=$(uname -s)
+    case $OS in 
+        Darwin)
+        case $ARCH in 
+            arm64|aarch64)
+                export LIB_STAMPY="target/release/libstampy_php_cli.dylib"
+            ;;
+            x86_64)
+                export LIB_STAMPY="target/x86_64-apple-darwin/libstampy_php_cli.dylib"
+            ;;
+        esac
+        ;;
+        Linux)
+        case $ARCH in 
+            amd64)
+                export LIB_STAMPY="target/release/aarch64-unknown-linux-gnu/libstampy_php_cli.so"
+            ;;
+            arm64)
+                export LIB_STAMPY="target/release/x86_64-unknown-linux-gnu/libstampy_php_cli.so"
+            ;;
+        esac
+        ;;
+        CYGWIN_NT-*|MSYS_NT-*|MSYS_NT-*|Windows_NT)
+        case $ARCH in 
+            x86_64)
+                export LIB_STAMPY="target/release/x86_64-pc-windows-gnu/release/libstampy_php_cli.dll"
+            ;;
+        esac
+        ;;
+    esac
+}
 
-php -d extension=target/release/libstampy_php_cli.dylib init/install.php < ../test/composer.json > init/local.env
-# php -d extension=target/release/libstampy_php_cli.dylib -f init/installEnv.php < ../test/composer.json > local.env
-# cd ../test;
-# mkdir -p console;
-# cp ../php-cli/index console/bin;
-# mkdir -p Controller;
-# cp -r ../php-cli/app/Controller/ Controller/ ;
-# php -f ../php-cli/init/env.php < composer.json > .env;
-# php -f ../php-cli/init/create_bin.php < composer.json > bin;
-# chmod 755 bin;
+# target=$(system_finder)
+system_finder
+# echo $LIB_STAMPY;
+
+
+
+# init_path="vendor/stampy/php-cli/init/"
+init_path="php-cli/init/"
+
+# ext="extension=vendor/stampy/php-cli/$target";
+# ext="extension=../$LIB_STAMPY";
+
+cd "../"
+extcom=$([[ $LIB_STAMPY ]] && echo "-d extension=php-cli/$LIB_STAMPY");
+
+php $extcom "$init_path"preCompileOption.php;
+php_result=$?;
+
+if [ "$php_result" -eq 1 ]; then
+    echo "docker1";
+
+    # docker output
+    # result=$(php "$init_path"install.php < composer.json);
+    # ls -l
+    # script=$(EXT="app/target/release/libstampy_php_cli.so" php "$init_path"create_bin.php);
+    # script=$(EXT="app/target/release/libstampy_php_cli.so" php "$init_path"create_bin.php);
+
+    STDOUT="php-cli/local.env" COMPOSER="composer.json" php $extcom "$init_path"install.php;
+    export $(grep -v '^#' php-cli/local.env),
+    docker buildx build --progress=plain -f php-cli/docker-bin/dockerfile.stampy . -t stampy-image:latest \
+    --build-arg ENTRY=$ENTRY \
+    --platform linux/arm64
+    # docker buildx build -f php-cli/docker-bin/dockerfile.bin.img . -t stampy-image:latest ;
+    # php_result=$?;
+    exit 1
+elif [ "$php_result" -eq 2 ]; then
+    # cargo build --release
+    echo "cargo0"
+    exit 1
+fi
+
+# ls -l;
+# php $extcom "$init_path"install.php < composer.json
+
+# echo $result;
+# [[ $result ]] && echo "-d extension=php-cli/$LIB_STAMPY" || $result 
+# echo "$result"
+# case $result in 
+#     cargo)
+#         echo "bin from cargo";
+#     ;;
+#     docker)
+#         echo "bin from docker";
+#     ;;
+# esac
+
+
+# php -d $ext "$init_path"install.php < composer.json > .env;
+# export $(grep -v '^#' .env );
+
+# mkdir $ENTRY;
+# php "$init_path"create_index.php > "$ENTRY"bin;
+# php "$init_path"create_bin.php > stampy;
+# chmod 755 stampy;
+
+# mkdir -p "$ENTRY"controller;
+# class=$(php -d $ext -r "echo Dialoguer::input(\"Name your controller ?\",true);");
+# php -d $ext "$init_path"create_controller.php $class > "$ENTRY"controller/$class.php;
+
 
