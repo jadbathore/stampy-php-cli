@@ -10,7 +10,7 @@ class ComposerHandler {
 
     public function get_arrayContent(){
         $autoloader = $this->stream->{"autoload"};
-        return $autoloader?->{"psr-4"}??$autoloader?->{"psr-0"}??$autoloader?->{"classmap"}??$autoloader?->{"files"};
+        return $autoloader?->{"psr-4"} ?? $autoloader?->{"psr-0"} ?? $autoloader?->{"classmap"} ?? $autoloader?->{"files"};
     }
 
     public function getlist(){
@@ -41,44 +41,24 @@ function confirm(string $result,array $keys) {
     return $result;
 }
 
-
 $confirm = false;
 $result;
 $composer = new ComposerHandler();
-$use_ext= class_exists("Dialoguer");
 $ques1 = "In witch namespace do you want to use your command-line-interface ?";
 $ques2 = "Do you want to use";
 $ques3 = "Do you want to do this later ?";
-
-while ($confirm == false){
-    $confirm1 = true;
-    if (class_exists("Dialoguer")){
+if (count($composer->getlist()) >= 2){
+    while ($confirm == false){
         $result = array_search(Dialoguer::select($ques1,$composer->getlist(),true),$composer->getlist());
-        $confirm1 = Dialoguer::confirm("$ques2 $result ?",true);
-        if($confirm1 == false){
-            (Dialoguer::confirm("Do you want to do this later ?",true))?die():"";
-        } 
-    } else {
-        $keys = array_keys($composer->getlist());
-        echo $ques1 ." chose between ". "[". implode('|',array_keys($keys)) ."]";
-        echo "\n> " . implode("\n> ",$keys);
-        $result = trim(fgets(STDIN));
-        $result_index = confirm($result,array_keys($keys));
-        echo PHP_EOL;
-        echo "$ques2". $composer->getlist()[$keys[$result_index]] ."? [y/n]";
-        $result = trim(fgets(STDIN));
-        $conf2 = confirm($result,['y','n']);
-        $confirm1 = ($conf2 == "y");
-        $result = $keys[$result_index];
-        // echo $composer->getNamespace($result_index);
-    }
-    if($confirm1 == false){
-        (Dialoguer::confirm("Do you want to do this later ?",true))?die():"";
-    } else {
-        $confirm = $confirm1;
-    }
-}
+        $confirm = Dialoguer::confirm("$ques2 $result ?",true);
+    }   
+    $arraykey = array_search($result,$composer->getlist());
+    echo 'ENTRY='.$composer->get_arrayContent()->{ $result }.'console/';
+    echo PHP_EOL;
 
-$arraykey = array_search($result,$composer->getlist());
-$entry='ENTRY='.$composer->get_arrayContent()->{ $result }.'console/';
-$namespace='NAMESPACE='.$result.'console\\controller';
+    echo 'NAMESPACE='.$result.'console\\controller';
+} else {
+    echo 'ENTRY='. array_values((array) $composer->get_arrayContent())[0] .'console/';
+    echo PHP_EOL;
+    echo 'NAMESPACE='. array_keys((array) $composer->get_arrayContent())[0] .'console\\controller';
+}

@@ -1,0 +1,6 @@
+FROM --platform=$BUILDPLATFORM rust:latest 
+
+RUN cd app && cargo build --release
+
+RUN echo '#!/bin/bash' > /usr/local/bin/t && \
+chmod 777 /usr/local/bin/t

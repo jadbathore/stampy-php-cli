@@ -47,9 +47,8 @@ x84_64-win:
 	docker cp stampy-temp:/php-cli/target/$(TARGET_WIN_X86_64)/release/ ./target/release/$(TARGET_WIN_X86_64)/ && \
 	docker rm stampy-temp && \
 	docker rmi -f stampy/php-cli-lib:v1
-
 clean:
-
+	docker system prune -a
 
 # Cible par défaut
 all: self linux x84_64-win

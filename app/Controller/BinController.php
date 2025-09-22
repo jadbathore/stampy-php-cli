@@ -6,7 +6,7 @@ use Stampy\Model\Attributes\Command;
 use Stampy\Model\Attributes\Description;
 use Stampy\Model\Attributes\Option;
 use Stampy\Model\Class\Object\Option_CLI;
-use \Dialoguer;
+
 use Stampy\Model\Attributes\StdErr;
 use Stampy\Model\Attributes\StdIn;
 use Stampy\Model\Attributes\StdOut;

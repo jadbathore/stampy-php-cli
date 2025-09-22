@@ -3,7 +3,7 @@
 echo implode("\n",[
 "#!/usr/bin/env php",
 "<?php",
-"require_once 'vendor/autoload.php';",
+"require_once 'app/vendor/autoload.php';",
 "",
 "use Stampy\Model\Class\ControllerHandler\BinControllerHandler;",
 "use Stampy\Model\Class\ControllerHandler\JumpStart;",

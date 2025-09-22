@@ -1,23 +1,24 @@
 <?php
 
+
 $class = $argv[1];
 
-$command = Dialoguer::input("Name your command ?",true);
+$command = \Dialoguer::input("Name your command ?",true);
 
 
 $option = "";
 $param = "";
-if(Dialoguer::confirm("Do you want to had options",true)){
+if(\Dialoguer::confirm("Do you want to had options",true)){
     $option .= "\t\tOption([\n";
     $confirm = true;
     $param = "\n";
     while($confirm){
-        $option_name = Dialoguer::input("Name your option?",true);
-        $input_bool = Dialoguer::confirm("Does that option could have input ? ",true);
+        $option_name = \Dialoguer::input("Name your option?",true);
+        $input_bool = \Dialoguer::confirm("Does that option could have input ? ",true);
         $format = ($input_bool)?"true":"false";
         $option .= "\t\t\t\"-$option_name\"=> new Option_CLI($format,\"test option with input\"),\n";
         $param .= "\t\t" . (($input_bool)?"null|bool|string":"null|bool") . " \$$option_name,\n";
-        $confirm = Dialoguer::confirm("Do you want to had a other option ",true);
+        $confirm = \Dialoguer::confirm("Do you want to had a other option ",true);
     }
     $option .= "\t\t]),\n";
 }
