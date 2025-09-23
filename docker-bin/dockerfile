@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ./composer.json ./
+COPY ./composer.test.json ./composer.json
 RUN mkdir app 
 
 COPY ./app/Model ./app/Model

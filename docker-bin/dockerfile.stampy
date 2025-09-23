@@ -11,9 +11,9 @@ COPY ./php-cli/init ./
 COPY ./php-cli/src ./rust/src
 COPY ./php-cli/Cargo.toml ./rust
 COPY ./php-cli/build.rs ./rust
-COPY ./composer.json ./input.json
+COPY ./php-cli/composer.test.json ./composer.json
 
 RUN cd rust && cargo build --release 
 RUN cp -r rust/target/release/libstampy_php_cli.so /usr/lib/php/20240924/stampy_php_cli.so 
 RUN chmod 644 /usr/lib/php/20240924/stampy_php_cli.so;
-RUN mkdir controller;
+RUN mkdir Controller;

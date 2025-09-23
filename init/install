@@ -49,7 +49,7 @@ init_path="php-cli/init/";
 cd "../";
 
 extcom=$([[ $LIB_STAMPY ]] && echo "-d extension=php-cli/$LIB_STAMPY");
-
+# COMPOSER="php-cli/composer.test.json" php $extcom "$init_path"docker-version/install.php > php-cli/local.env ;
 php $extcom "$init_path"preCompileOption.php;
 php_result=$?;
 
@@ -67,21 +67,22 @@ if [ "$php_result" -eq 1 ]; then
     docker buildx build -f php-cli/docker-bin/dockerfile.stampy . -t $IMAGE:latest --platform linux/arm64;
 
     docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c "
-        COMPOSER="input.json" php -d extension=/usr/lib/php/20240924/stampy_php_cli.so docker-version/install.php > var.txt 
+        COMPOSER=\"composer.json\" php -d extension=/usr/lib/php/20240924/stampy_php_cli.so docker-version/install.php > var.txt 
     " && \
-
 	docker cp $CONTAINER:/var.txt ./php-cli/test/.env  && \
     export $(grep -v '^#' ./php-cli/test/.env) && \
-	docker rm $CONTAINER
-    SOURCE="php-cli/test/$ENTRY"
-    mkdir -p $SOURCE
-    mkdir -p "$SOURCE"controller
-
-    docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c "
-        NAMESPACE=\"$NAMESPACE\" php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > controller/BinControllerExample.php
-    ";
-	docker cp $CONTAINER:/controller/BinControllerExample.php $SOURCE"controller/BinControllerExample.php";
 	docker rm $CONTAINER;
+    SOURCE="php-cli/test/"$ENTRY
+    mkdir -p $SOURCE
+    # echo "NAMESPACE=$NAMESPACE php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > Controller/BinControllerExample.php"
+    docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c " 
+        NAMESPACE=$NAMESPACE  php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > Controller/BinControllerExample.php 
+    ";
+	docker cp $CONTAINER:/composer.json php-cli/composer.json
+	docker cp $CONTAINER:/Controller/BinControllerExample.php $SOURCE"BinControllerExample.php";
+	docker rm $CONTAINER;
+    cd php-cli && composer dump-autoload;
+    cd ../
     docker compose -f php-cli/docker-bin/docker-compose.yaml build --build-arg ENTRY="$ENTRY";
     docker compose -f php-cli/docker-bin/docker-compose.yaml up -d;
     # php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > /controller/BinControllerExample.php && \
@@ -107,32 +108,32 @@ elif [ "$php_result" -eq 2 ]; then
     exit 1
 fi
 
-# ls -l;
-# php $extcom "$init_path"install.php < composer.json
+# # ls -l;
+# # php $extcom "$init_path"install.php < composer.json
 
-# echo $result;
-# [[ $result ]] && echo "-d extension=php-cli/$LIB_STAMPY" || $result 
-# echo "$result"
-# case $result in 
-#     cargo)
-#         echo "bin from cargo";
-#     ;;
-#     docker)
-#         echo "bin from docker";
-#     ;;
-# esac
+# # echo $result;
+# # [[ $result ]] && echo "-d extension=php-cli/$LIB_STAMPY" || $result 
+# # echo "$result"
+# # case $result in 
+# #     cargo)
+# #         echo "bin from cargo";
+# #     ;;
+# #     docker)
+# #         echo "bin from docker";
+# #     ;;
+# # esac
 
 
-# php -d $ext "$init_path"install.php < composer.json > .env;
-# export $(grep -v '^#' .env );
+# # php -d $ext "$init_path"install.php < composer.json > .env;
+# # export $(grep -v '^#' .env );
 
-# mkdir $ENTRY;
-# php "$init_path"create_index.php > "$ENTRY"bin;
-# php "$init_path"create_bin.php > stampy;
-# chmod 755 stampy;
+# # mkdir $ENTRY;
+# # php "$init_path"create_index.php > "$ENTRY"bin;
+# # php "$init_path"create_bin.php > stampy;
+# # chmod 755 stampy;
 
-# mkdir -p "$ENTRY"controller;
-# class=$(php -d $ext -r "echo Dialoguer::input(\"Name your controller ?\",true);");
-# php -d $ext "$init_path"create_controller.php $class > "$ENTRY"controller/$class.php;
+# # mkdir -p "$ENTRY"controller;
+# # class=$(php -d $ext -r "echo Dialoguer::input(\"Name your controller ?\",true);");
+# # php -d $ext "$init_path"create_controller.php $class > "$ENTRY"controller/$class.php;
 
 

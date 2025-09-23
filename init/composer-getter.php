@@ -22,6 +22,7 @@ class ComposerHandler {
     }
 }
 
+
 $composer= new ComposerHandler();
 echo "AUTOLOADERCONTENT=".implode(",",$composer->getlist());
 

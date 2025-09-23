@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-require_once __DIR__.'vendor/autoload.php';
+require_once 'vendor/autoload.php';
 
 use Stampy\Model\Class\ControllerHandler\BinControllerHandler;
 use Stampy\Model\Class\ControllerHandler\JumpStart;
@@ -14,7 +14,6 @@ try{
         new JumpStart(getenv("CLASS"),getenv("METHOD"),$argv)->start();
     } else {
         $controllersNameSpace = new \NamespaceHandler(__DIR__.getenv("ENTRY"),getenv("NAMESPACE"));
-        var_dump($controllersNameSpace->resolve());
         new BinControllerHandler($controllersNameSpace->resolve(),$argv)->start();
     }
 } catch(Error $e) {

@@ -1,6 +1,4 @@
 <?php
-
-
 echo implode("\n",[
     "#!/bin/bash",
     "export $(grep -v '^#' ".getenv("ENTRY").".env )",
@@ -11,7 +9,7 @@ echo implode("\n",[
     'fi',
     "implode() {",
     "\tlocal sep=".'"$1"'."; shift",
-    "\tlocal arr=(".'"$@"'.")",
+    "\tlocal arr=$(".'"$@"'.")",
     "\tlocal IFS=".'"$sep"',
     "\techo".'"$*"',
     '}',

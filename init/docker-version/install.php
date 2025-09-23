@@ -1,11 +1,13 @@
 <?php
 
+use JsonSchema\Uri\Retrievers\FileGetContents;
+
 class ComposerHandler {
     private mixed $stream;
 
     public function __construct()
     {
-        $this->stream = json_decode((null !== (getenv("COMPOSER")))?file_get_contents(getenv("COMPOSER")) :stream_get_contents(STDIN));
+        $this->stream = json_decode(file_get_contents(getenv("COMPOSER")));
     }
 
     public function get_arrayContent(){
@@ -26,8 +28,16 @@ class ComposerHandler {
         return ((array) $this->get_arrayContent())[$key];
     }
 
+    public function add(string $key,string $value){
+        $this->get_arrayContent()->{$key} = $value;
+    }
+
     public function getNamespace(int $index){
         return array_keys($this->getlist())[$index];
+    }
+    
+    public function getStream(){
+        return $this->stream;
     }
 }
 
@@ -42,23 +52,26 @@ function confirm(string $result,array $keys) {
 }
 
 $confirm = false;
-$result;
+$key;$value;
 $composer = new ComposerHandler();
 $ques1 = "In witch namespace do you want to use your command-line-interface ?";
 $ques2 = "Do you want to use";
 $ques3 = "Do you want to do this later ?";
-if (count($composer->getlist()) >= 2){
-    while ($confirm == false){
-        $result = array_search(Dialoguer::select($ques1,$composer->getlist(),true),$composer->getlist());
-        $confirm = Dialoguer::confirm("$ques2 $result ?",true);
-    }   
-    $arraykey = array_search($result,$composer->getlist());
-    echo 'ENTRY='.$composer->get_arrayContent()->{ $result }.'console/';
-    echo PHP_EOL;
 
-    echo 'NAMESPACE='.$result.'console\\controller';
+if (count($composer->getlist()) >= 2){
+    while (!$confirm){
+        $key = array_search(Dialoguer::select($ques1,$composer->getlist(),true),$composer->getlist());
+        $confirm = Dialoguer::confirm("$ques2 $key ?",true);
+    }   
+    $value = $composer->get_arrayContent()->{ $key };
 } else {
-    echo 'ENTRY='. array_values((array) $composer->get_arrayContent())[0] .'console/';
-    echo PHP_EOL;
-    echo 'NAMESPACE='. array_keys((array) $composer->get_arrayContent())[0] .'console\\controller';
+    $value = array_values((array) $composer->get_arrayContent())[0];
+    $key = array_keys((array) $composer->get_arrayContent())[0];
 }
+$stampy = "StampyConsole\\";
+echo "NAMESPACE=$stampy";
+echo PHP_EOL;
+echo 'ENTRY='.$value."console/";
+$composer->add("StampyConsole\\",$value."console/");
+$decode = json_encode($composer->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+file_put_contents(getenv("COMPOSER"),$decode);

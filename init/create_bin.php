@@ -2,7 +2,7 @@
 $entry = getenv("ENTRY")."bin";
 
 echo implode("\n",[
-    "#!/bin/bash",
+    "#!/bin/sh",
     "export $(grep -v '^#' .env )",
     'ext="extension='.getenv("EXT").'"',
     "if [ $# -eq 0 ]; then",
@@ -11,7 +11,7 @@ echo implode("\n",[
     'fi',
     "implode() {",
     "\tlocal sep=".'"$1"'."; shift",
-    "\tlocal arr=(".'"$@"'.")",
+    "\tlocal arr=$(".'"$@"'.")",
     "\tlocal IFS=".'"$sep"',
     "\techo".'"$*"',
     '}',

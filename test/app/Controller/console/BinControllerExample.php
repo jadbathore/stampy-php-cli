@@ -1,5 +1,5 @@
 <?php
-namespace Test\src\console\controller;
+namespace StampyConsole;
 
 use Stampy\Model\Abstract\AbstractPrompsController;
 use Stampy\Model\Class\Object\Option_CLI;
@@ -16,6 +16,7 @@ class BinControllerExample extends AbstractPrompsController
 		Command('command1'),
 		Option([
 			"-op1"=> new Option_CLI(true,"test option with input"),
+			"-option"=> new Option_CLI(true,"test option with input"),
 		]),
 
 		Description('Test function'),
@@ -23,8 +24,9 @@ class BinControllerExample extends AbstractPrompsController
 		StdIn("input-file.json"),
 		StdOut("output-file.txt"),
 	]
-	public function command1(
+	public function command(
 		null|bool|string $op1,
+		null|bool|string $option,
 ){
 		/* --- code TODO ---- */
 	}
