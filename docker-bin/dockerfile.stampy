@@ -1,3 +1,5 @@
+
+
 FROM --platform=$BUILDPLATFORM rust:latest 
 
 RUN apt-get update && apt-get install -y \
@@ -5,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     php-cli \
     php-dev \
     libclang-dev \
-    bash;
+    tree;
 
 COPY ./php-cli/init ./
 COPY ./php-cli/src ./rust/src
@@ -16,4 +18,3 @@ COPY ./php-cli/composer.test.json ./composer.json
 RUN cd rust && cargo build --release 
 RUN cp -r rust/target/release/libstampy_php_cli.so /usr/lib/php/20240924/stampy_php_cli.so 
 RUN chmod 644 /usr/lib/php/20240924/stampy_php_cli.so;
-RUN mkdir Controller;

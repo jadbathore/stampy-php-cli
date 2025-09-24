@@ -10,8 +10,10 @@ services:
         ENTRY: ${ENTRY} 
     command: ["tail", "-f", "/dev/null"]
     volumes:
-      - ../test/${ENTRY}/controller/:/app/Controller/
+      - ../test/${ENTRY}/:/${ENTRY}
       - ../test/.env:/.env
       - ../vendor:/vendor
       - ../composer.test.json:/composer.json
       - ../test.php:/index
+      - ../stam:/usr/local/bin/stampy
+      - ../:/tmp

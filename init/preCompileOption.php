@@ -13,19 +13,16 @@ if (getenv("LIB_STAMPY")) {
     }
 
 } else {
-    echo "the stampy extension add no pré-compile binairy for your architecture you can  ?
-    you could compile by yourself using cargo or use docker
-    if you using cargo make sure you got cargo install (https://doc.rust-lang.org/cargo/commands/cargo-install.html)
-    if you using docker make sure you docker damion running
-    [cargo/docker]\n
-    "; 
+    echo "the stampy extension add no pré-compile binairy for your architecture you can compile the binairy by yourself 
+using cargo or use docker.If you using cargo make sure you got cargo install (https://doc.rust-lang.org/cargo/commands/cargo-install.html).
+If you using docker make sure you docker daemon running [cargo/docker] ? "; 
     $conform=false;
     $input="";
     while($conform == false ){
         $input = trim(fgets(STDIN));
         $conform = ($input == "cargo"||$input == "docker");
         if($conform == false) {
-            echo "('$input') is not a valid input you must choose between [cargo/docker]\n" ;
+            echo "('$input') is not a valid input you must choose between [cargo/docker] ? " ;
         }
     }
     $codeOutput = ($input == "cargo")?2:1;

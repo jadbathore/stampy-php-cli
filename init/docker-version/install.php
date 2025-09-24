@@ -68,10 +68,10 @@ if (count($composer->getlist()) >= 2){
     $value = array_values((array) $composer->get_arrayContent())[0];
     $key = array_keys((array) $composer->get_arrayContent())[0];
 }
-$stampy = "StampyConsole\\";
+$stampy = "StampyConsole";
 echo "NAMESPACE=$stampy";
 echo PHP_EOL;
 echo 'ENTRY='.$value."console/";
-$composer->add("StampyConsole\\",$value."console/");
+$composer->add("$stampy\\",$value."console/");
 $decode = json_encode($composer->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 file_put_contents(getenv("COMPOSER"),$decode);

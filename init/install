@@ -35,7 +35,7 @@ system_finder(){
 }
 
 # target=$(system_finder)
-system_finder
+# system_finder
 # echo $LIB_STAMPY;
 
 
@@ -56,14 +56,7 @@ php_result=$?;
 if [ "$php_result" -eq 1 ]; then
     CONTAINER="stampy-container";
     IMAGE="stampy";
-    # docker output
-    # result=$(php "$init_path"install.php < composer.json);
-    # ls -l
-    # script=$(EXT="app/target/release/libstampy_php_cli.so" php "$init_path"create_bin.php);
-    # script=$(EXT="app/target/release/libstampy_php_cli.so" php "$init_path"create_bin.php);
 
-    # STDOUT="php-cli/local.env" COMPOSER="composer.json" php $extcom "$init_path"install.php;
-    # export $(grep -v '^#' php-cli/local.env),
     docker buildx build -f php-cli/docker-bin/dockerfile.stampy . -t $IMAGE:latest --platform linux/arm64;
 
     docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c "
@@ -74,17 +67,34 @@ if [ "$php_result" -eq 1 ]; then
 	docker rm $CONTAINER;
     SOURCE="php-cli/test/"$ENTRY
     mkdir -p $SOURCE
-    # echo "NAMESPACE=$NAMESPACE php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > Controller/BinControllerExample.php"
-    docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c " 
-        NAMESPACE=$NAMESPACE  php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > Controller/BinControllerExample.php 
+    echo $SOURCE
+    # # echo "NAMESPACE=$NAMESPACE php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > Controller/BinControllerExample.php"
+    docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c \
+    " 
+        mkdir -p $ENTRY && \
+        NAMESPACE=$NAMESPACE  php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > $ENTRY/BinControllerExample.php
     ";
+
 	docker cp $CONTAINER:/composer.json php-cli/composer.json
-	docker cp $CONTAINER:/Controller/BinControllerExample.php $SOURCE"BinControllerExample.php";
+	docker cp $CONTAINER:$ENTRY"BinControllerExample.php" $SOURCE"BinControllerExample.php";
 	docker rm $CONTAINER;
     cd php-cli && composer dump-autoload;
     cd ../
     docker compose -f php-cli/docker-bin/docker-compose.yaml build --build-arg ENTRY="$ENTRY";
     docker compose -f php-cli/docker-bin/docker-compose.yaml up -d;
+
+    exit 1
+elif [ "$php_result" -eq 2 ]; then
+    cd php-cli && cargo build --release --target-dir ./target/release/custom-build
+    cd ../
+    ls -l php-cli/target/release/custom-build
+    exit 1
+fi
+# for file in $(find . -type f); do
+#   if [[ "$file" =~ Controller[A-Z].+\.php$ ]]; then
+#     echo "$file"
+#   fi
+# done
     # php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > /controller/BinControllerExample.php && \
     # php create_bin.php > stampy;
     # ls -l ;
@@ -102,12 +112,14 @@ if [ "$php_result" -eq 1 ]; then
     # docker exec -it stampy-container /bin/bash -c "ls -l";php -i | grep extension_dir
     # docker buildx build -f php-cli/docker-bin/dockerfile.bin.img . -t stampy-image:latest ;
     # php_result=$?;
-    exit 1
-elif [ "$php_result" -eq 2 ]; then
-    # cargo build --release
-    exit 1
-fi
+    # docker output
+    # result=$(php "$init_path"install.php < composer.json);
+    # ls -l
+    # script=$(EXT="app/target/release/libstampy_php_cli.so" php "$init_path"create_bin.php);
+    # script=$(EXT="app/target/release/libstampy_php_cli.so" php "$init_path"create_bin.php);
 
+    # STDOUT="php-cli/local.env" COMPOSER="composer.json" php $extcom "$init_path"install.php;
+    # export $(grep -v '^#' php-cli/local.env),
 # # ls -l;
 # # php $extcom "$init_path"install.php < composer.json
 
