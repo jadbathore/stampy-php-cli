@@ -7,7 +7,7 @@
         "psr-4": {
             "Stampy\\": "app/",
             "Test\\": "app/Controller/",
-            "StampyConsole\\": "app/Controller/console/"
+            "Stampy\\Extension\\":"plugin/"
         }
     },
     "authors": [
