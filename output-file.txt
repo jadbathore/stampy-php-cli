@@ -1,1 +1,23 @@
-hello
+[31;1munknown Option 'vendor/stampy/php-cli/index'[0m
+[44;1mIn file:/Users/jadbathore/Documents/coding/codding_rust/stampy-all/stampy/php-cli/app/Model/Class/ControllerHandler/BinControllerHandler.php [0m[44;4;1mon line:93[0m
+[32;1mError context :[0m
+[32m────────────────────────────────────────────────────────────────────────────────[0m
+[32;3m[Line #89]:[0m                break;
+[32;3m[Line #90]:[0m                case Argv::Input:
+[32;3m[Line #91]:[0m                    $method_CLI->addPromps($this->argvObject->getLast(),$this->argvObject->getCurrent());
+[32;3m[Line #92]:[0m                break;
+[31;3m[Line #93]:[0m[31;3;1m                default: throw new Error("unknown Option '".$this->argvObject->getCurrent()."'");
+[0m[32;3m[Line #94]:[0m            } 
+[32;3m[Line #95]:[0m            $this->argvObject->next();
+[32;3m[Line #96]:[0m        } 
+[32;3m[Line #97]:[0m    }
+[32m────────────────────────────────────────────────────────────────────────────────[0m
+[33;4;1mstack trace:[0m
+[33;4;3mStampy\Model\Class\ControllerHandler\BinControllerHandler->populateMethod[0m
+in file 
+[45;1m/Users/jadbathore/Documents/coding/codding_rust/stampy-all/stampy/php-cli/app/Model/Class/ControllerHandler/JumpStart.php[0m[45;1m on line 26[0m
+[33;4;3mStampy\Model\Class\ControllerHandler\JumpStart->start[0m
+in file 
+[45;1m/Users/jadbathore/Documents/coding/codding_rust/stampy-all/stampy/php-cli/index[0m[45;1m on line 14[0m
+
+

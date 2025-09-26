@@ -1,8 +1,8 @@
 <?php
 echo implode("\n",[
     "#!/bin/bash",
-    "export $(grep -v '^#' ".getenv("ENTRY").".env )",
-    'ext="extension='.getenv("EXT").'"',
+    "export $(grep -v '^#' .env )",
+    'ext="extension='.getenv("CONTEXT").getenv("EXT").'"',
     "if [ $# -eq 0 ]; then",
     "\t".'php -d $ext index',
     "\texit 1",
@@ -23,10 +23,10 @@ echo implode("\n",[
     "\t".'ERR=$([[ "$3" != "#" ]] && echo "2> $3");',
     "\t".'IN=$([[ "$4" != "#" ]] && echo "< $4");',
     "\t".'OUT=$([[ "$5" != "#" ]] && echo "> $5");',
-    "\t".'eval "CLASS=\"$class\" METHOD=\"$method\" php -d $ext index $(implode " " ${rest[@]}) $IN $OUT $ERR"',
+    "\t".'eval "CLASS=\"$class\" METHOD=\"$method\" php -d $ext '. getenv("CONTEXT").'index $(implode " " ${rest[@]}) $IN $OUT $ERR"',
     '}',
     'args=$(implode " " "$@");',
-    'result=$(php -d $ext index $args)',
+    'result=$(php -d $ext ' . getenv("CONTEXT") .'index $args)',
     'if echo $result | grep -q "EXIT"; then',
     "\t".'arr=($result)',
     "\t".'stdphp ${arr[@]:1} $args',

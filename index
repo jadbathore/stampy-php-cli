@@ -11,9 +11,9 @@ use Stampy\Model\Class\throwable\binError;
 
 try{
     if(getenv("CLASS") && getenv("METHOD")){
-        new JumpStart(getenv("CLASS"),getenv("METHOD"),$argv)->start();
+        new JumpStart(getenv("CLASS"),getenv("METHOD"),array_slice($argv,1))->start();
     } else {
-        $controllersNameSpace = new \NamespaceHandler(__DIR__.getenv("ENTRY"),getenv("NAMESPACE"));
+        $controllersNameSpace = new \NamespaceHandler("./".getenv("ENTRY"),getenv("NAMESPACE"));
         new BinControllerHandler($controllersNameSpace->resolve(),$argv)->start();
     }
 } catch(Error $e) {
