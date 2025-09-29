@@ -1,7 +1,5 @@
 <?php
 
-use JsonSchema\Uri\Retrievers\FileGetContents;
-
 class ComposerHandler {
     private mixed $stream;
 
@@ -68,6 +66,7 @@ if (count($composer->getlist()) >= 2){
     $value = array_values((array) $composer->get_arrayContent())[0];
     $key = array_keys((array) $composer->get_arrayContent())[0];
 }
+
 $stampy = "StampyConsole";
 echo "NAMESPACE=$stampy";
 echo PHP_EOL;

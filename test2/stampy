@@ -1,15 +1,15 @@
 #!/bin/bash
-export $(grep -v '^#' app/Controller/console/.env )
-ext="extension=target/release/libstampy_php_cli.dylib"
+export $(grep -v '^#' .env )
+ext="extension=./php-cli/target/release/custom-build/release/libstampy_php_cli.dylib"
 if [ $# -eq 0 ]; then
 	php -d $ext index
 	exit 1
 fi
 implode() {
 	local sep="$1"; shift
-	local arr=$("$@")
+	local arr=("$@")
 	local IFS="$sep"
-	echo"$*"
+	echo "$*"
 }
 stdphp()
 {

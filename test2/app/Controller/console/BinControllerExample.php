@@ -13,19 +13,14 @@ use Stampy\Model\Attributes\StdIn;
 class BinControllerExample extends AbstractPrompsController
 {
 	#[
-		Command('com'),
-		Option([
-			"-op1"=> new Option_CLI(false,"test option with input"),
-		]),
+		Command('command'),
 
 		Description('Test function'),
 		StdErr("error.log"),
 		StdIn("input-file.json"),
 		StdOut("output-file.txt"),
 	]
-	public function com(
-		null|bool $op1,
-){
+	public function command(){
 		/* --- code TODO ---- */
 	}
 }

@@ -1,17 +1,19 @@
 <?php
+
+
 echo implode("\n",[
     "#!/bin/bash",
     "export $(grep -v '^#' .env )",
-    'ext="extension='.getenv("CONTEXT").getenv("EXT").'"',
+    'ext="extension='.getenv("EXT").'"',
     "if [ $# -eq 0 ]; then",
-    "\t".'php -d $ext index',
+    "\t".'php -d $ext '.getenv("CONTEXT").'index',
     "\texit 1",
     'fi',
     "implode() {",
     "\tlocal sep=".'"$1"'."; shift",
-    "\tlocal arr=$(".'"$@"'.")",
+    "\tlocal arr=(".'"$@"'.")",
     "\tlocal IFS=".'"$sep"',
-    "\techo".'"$*"',
+    "\techo ".'"$*"',
     '}',
     "stdphp()",
     "{",
