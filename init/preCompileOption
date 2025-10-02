@@ -7,9 +7,7 @@ system_finder(){
         Darwin)
         case $ARCH in 
             arm64|aarch64)
-                # export LIB_STAMPY="target/release/libstampy_php_cli.dylib"
-                exit 148
-
+                export LIB_STAMPY="target/release/libstampy_php_cli.dylib"
             ;;
             x86_64)
                 export LIB_STAMPY="target/x86_64-apple-darwin/libstampy_php_cli.dylib"

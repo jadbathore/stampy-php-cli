@@ -7,15 +7,12 @@
         "psr-4": {
             "Stampy\\": "app/",
             "Test\\": "app/Controller/",
-            "Stampy\\Extension\\":"plugin/"
+            "Stampy\\Extension\\": "plugin/"
         }
     },
     "bin": [
         "bin/dockerStampy"
     ],
-    "scripts":{
-        "bin":"echo \"test\""
-    },
     "authors": [
         {
             "name": "jadbathore"
@@ -30,5 +27,8 @@
     },
     "extra": {
         "class": "Stampy\\Extension\\Plugin"
+    },
+    "scripts": {
+        "dockerStampy": "./vendor/bin/dockerStampy"
     }
 }

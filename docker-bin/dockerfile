@@ -3,12 +3,9 @@ ARG BUILDPLATFORM
 
 FROM --platform=$BUILDPLATFORM stampy:latest 
 
-RUN EXT="/usr/lib/php/20240924/stampy_php_cli.so"  php docker-version/create_bin.php > usr/local/bin/stampy
-# ENTRYPOINT ["stampy"];
 
-
-COPY ./index ./
-
+RUN EXT="/usr/lib/php/20240924/stampy_php_cli.so" OUTPUT="tmp/" php docker-version/create_bin.php > usr/local/bin/stampy
+# # ENTRYPOINT ["stampy"];
 
 RUN apt-get update && apt-get install -y \
     unzip \
@@ -16,14 +13,12 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ./composer.test.json ./composer.json
-RUN mkdir app 
+# # COPY ./composer.test.json ./composer.json
 
-COPY ./app/Model ./app/Model
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-RUN composer install
+RUN cp composer.stampy.json composer.json
+RUN composer install 
 
 RUN chmod 777 usr/local/bin/stampy
 RUN chmod 777 index

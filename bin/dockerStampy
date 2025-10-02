@@ -1,0 +1,15 @@
+#!/bin/bash
+
+CONTAINER="stampy-container";
+IMAGE="stampy";
+
+tmp_doc=tmp-link-$$-$(date +%s)
+mkdir -p $tmp_doc
+cp ./composer.json $tmp_doc/composer.json
+cp -R -L ./vendor/stampy/php-cli/ "$tmp_doc/php-cli/"
+docker buildx build --progress=plain -f ./vendor/stampy/php-cli/docker-bin/dockerfile.stampy ./$tmp_doc -t $IMAGE:latest --platform linux/arm64
+docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c "
+	COMPOSER=composer.json php -d extension=/usr/lib/php/20240924/stampy_php_cli.so docker-version/install.php > var.txt
+"
+rm -rf $tmp_doc
+

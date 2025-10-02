@@ -10,40 +10,58 @@ exec-php() {
     fi 
 }
 
+exec-docker() {
+    local script=$@;
+    docker $script;
+    result=$?;
+    if [ "$result" -eq 130 ]; then
+        exit 130 
+    fi 
+}
+
+
 
 cd vendor/stampy/;
-
-
 
 if [ "$1" -eq 1 ]; then
     CONTAINER="stampy-container";
     IMAGE="stampy";
-    docker buildx build -f php-cli/docker-bin/dockerfile.stampy . -t $IMAGE:latest --platform linux/arm64;
-    docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c "
-        COMPOSER=\"composer.json\" php -d extension=/usr/lib/php/20240924/stampy_php_cli.so docker-version/install.php > var.txt 
-    " && \
-	docker cp $CONTAINER:/var.txt ./php-cli/test/.env  && \
-    export $(grep -v '^#' ./php-cli/test/.env) && \
-	docker rm $CONTAINER;
-    SOURCE="php-cli/test/"$ENTRY
-    mkdir -p $SOURCE
-    echo $SOURCE
-    docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c \
-    " 
-        mkdir -p $ENTRY && \
-        NAMESPACE=$NAMESPACE  php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > $ENTRY/BinControllerExample.php
-    ";
-	docker cp $CONTAINER:/composer.json php-cli/composer.json
-	docker cp $CONTAINER:$ENTRY"BinControllerExample.php" $SOURCE"BinControllerExample.php";
-	docker rm $CONTAINER;
-    cd php-cli && composer dump-autoload;
-    cd ../
-    docker compose -f php-cli/docker-bin/docker-compose.yaml build --build-arg ENTRY="$ENTRY";
-    docker compose -f php-cli/docker-bin/docker-compose.yaml up -d;
+    COMPOSER=../../composer.json php php-cli/init/installScript.php
+
+    # php php-cli/init/docker-version/dockerStampy.php > ../bin/dockerStampy;
+    # chmod 700 ../bin/dockerStampy;
+
+    # cd ../../;
+    # tmp_doc=tmp-link-$$-$(date +%s)
+    # mkdir -p $tmp_doc
+    # cp ./composer.json $tmp_doc/composer.json
+    # cp -R -L ./vendor/stampy/php-cli/ "$tmp_doc/php-cli/"
+    # exec-docker buildx build --progress=plain -f ./vendor/stampy/php-cli/docker-bin/dockerfile.stampy ./$tmp_doc -t $IMAGE:latest --platform linux/arm64 
+    # rm -rf $tmp_doc
+    # cd vendor/stampy/;
+    # docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c " 
+    #     COMPOSER=composer.json php -a -d extension=/usr/lib/php/20240924/stampy_php_cli.so docker-version/install.php > var.txt 
+    # " && \
+    # tree ./
+	# exec-docker cp $CONTAINER:/var.txt ../../.env  && \
+    # export $(grep -v '^#' ../../.env) && \
+	# docker rm $CONTAINER;
+    # SOURCE=../../"$ENTRY"
+    # mkdir -p $SOURCE
+    # # echo $SOURCE
+    # exec-docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c \
+    # " 
+    #     mkdir -p $ENTRY && \
+    #     NAMESPACE=$NAMESPACE  php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > $ENTRY/BinControllerExample.php
+    # "
+	# exec-docker cp $CONTAINER:/composer.json ../../composer.json
+	# exec-docker cp $CONTAINER:$ENTRY"BinControllerExample.php" $SOURCE"BinControllerExample.php";
+	# exec-docker rm $CONTAINER;
+    # exec-docker compose -f php-cli/docker-bin/docker-compose.yaml build --build-arg ENTRY="$ENTRY";
+    # exec-docker compose -f php-cli/docker-bin/docker-compose.yaml up -d;
     exit 1
 elif [ "$1" -eq 2 ]; then
     cd php-cli && cargo build --target-dir ./target/release/custom-build
-    cd ../
     libfile="";
     for file in $(find ./php-cli/target/release/custom-build/release -type f); do
         if [[ "$file" =~ ^./php-cli/target/release/custom-build/release/libstampy_php_cli.(so|dylib|dll)$ ]]; then
@@ -51,15 +69,15 @@ elif [ "$1" -eq 2 ]; then
             break;
         fi
     done
-    mkdir -p php-cli/test2/
-    COMPOSER="../../composer.json" exec-php -d extension=$libfile php-cli/init/docker-version/install.php > ../../.env
+    
+    COMPOSER=../../composer.json exec-php -d extension=$libfile php-cli/init/docker-version/install.php > ../../.env
     export $(grep -v '^#' ../../.env)
     mkdir -p ../../$ENTRY
     exec-php -d extension=$libfile php-cli/init/create_controller.php  BinControllerExample > ../../"$ENTRY"BinControllerExample.php
     EXT="$libfile" exec-php php-cli/init/docker-version/create_bin.php > ../../stampy
     exit 1
 elif [ "$1" = 0 ]; then
-    COMPOSER="../../composer.json" exec-php -d extension=php-cli/$2 php-cli/init/docker-version/install.php > ../../.env
+    COMPOSER=../../composer.json exec-php -d extension=php-cli/$2 php-cli/init/docker-version/install.php > ../../.env
     export $(grep -v '^#' ../../.env)
     # SOURCE="php-cli/test3/"$ENTRY
     mkdir -p ../../$ENTRY
@@ -67,7 +85,5 @@ elif [ "$1" = 0 ]; then
     EXT="vendor/stampy/php-cli/$2" CONTEXT="vendor/stampy/php-cli/" php php-cli/init/docker-version/create_bin.php > ../../stampy
     chmod 700 ../../stampy
     exit 1
-else 
-    exit 2
 fi
 exit 2;

@@ -15,8 +15,6 @@ try{
         new JumpStart(getenv("CLASS"),getenv("METHOD"),array_slice($argv,1))->start();
     } else {
         $controllersNameSpace = new \NamespaceHandler(__DIR__.getenv("ENTRY"),getenv("NAMESPACE"));
-        // var_dump(__DIR__.getenv("ENTRY"),getenv("NAMESPACE"),$controllersNameSpace->resolve());
-        
         new BinControllerHandler($controllersNameSpace->resolve(),$argv)->start();
     }
 } catch(Error $e) {

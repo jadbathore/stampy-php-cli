@@ -2,18 +2,17 @@ services:
   stampy:
     container_name: stampy
     build:
-      context: ../
-      dockerfile: ./docker-bin/dockerfile
+      context: .
+      dockerfile: ./dockerfile
       platforms:
         - linux/arm64
       args:
         ENTRY: ${ENTRY} 
     command: ["tail", "-f", "/dev/null"]
     volumes:
-      - ../test/${ENTRY}/:/${ENTRY}
-      - ../test/.env:/.env
-      - ../vendor:/vendor
-      - ../composer.test.json:/composer.json
-      - ../test.php:/index
-      - ../stam:/usr/local/bin/stampy
-      - ../:/tmp
+      - ${PROJECT_ROOT:-.}/${ENTRY}:/${ENTRY}
+      - ${PROJECT_ROOT:-.}/.env:/.env
+    #   - vendor:/vendor
+      - ${PROJECT_ROOT:-.}/composer.stampy.json:/composer.json
+      # - stam:/usr/local/bin/stampy
+      - ${PROJECT_ROOT:-.}:/tmp

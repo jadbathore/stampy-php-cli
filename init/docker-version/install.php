@@ -1,11 +1,13 @@
 <?php
 
+
+
 class ComposerHandler {
     private mixed $stream;
 
-    public function __construct()
+    public function __construct(string $json_file)
     {
-        $this->stream = json_decode(file_get_contents(getenv("COMPOSER")));
+        $this->stream = json_decode(file_get_contents($json_file));
     }
 
     public function get_arrayContent(){
@@ -51,7 +53,7 @@ function confirm(string $result,array $keys) {
 
 $confirm = false;
 $key;$value;
-$composer = new ComposerHandler();
+$composer = new ComposerHandler(getenv("COMPOSER"));
 $ques1 = "In witch namespace do you want to use your command-line-interface ?";
 $ques2 = "Do you want to use";
 $ques3 = "Do you want to do this later ?";
@@ -74,3 +76,10 @@ echo 'ENTRY='.$value."console/";
 $composer->add("$stampy\\",$value."console/");
 $decode = json_encode($composer->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 file_put_contents(getenv("COMPOSER"),$decode);
+
+if(getenv("TRANSFERT")){
+    $transfert_Json  = new ComposerHandler(getenv("TRANSFERT"));
+    $transfert_Json->add("$stampy\\",$value."console/");
+    $decode = json_encode($transfert_Json->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    file_put_contents(getenv("TRANSFERT"),$decode);
+}

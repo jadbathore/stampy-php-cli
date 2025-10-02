@@ -14,7 +14,7 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
     use Coloring;
     public function activate(Composer $composer, IOInterface $io)
     {
-        $io->write("\n\t✨welcome to Stampy!✨\n");
+
     }
 
     public function deactivate(Composer $composer, IOInterface $io)
@@ -46,6 +46,7 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
         register_shutdown_function(function() use (&$code,&$io){
             switch($code){
                 case 1;
+                    $io->write("\n\t✨welcome to Stampy!✨\n");
                     $this->color("Stampy successfully install","green");
                 break;
                 case 130:
@@ -56,7 +57,7 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
                 default:
                     // echo $code;
                     $io->writeError(
-                        $this->textColor("unable to install stampy due to a installation error","bgred")
+                        $this->textColor("unable to install stampy due to a installation error exitCode:$code","bgred")
                     );
                     // exit;
             }
@@ -73,7 +74,7 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
                 $input = $io->ask(
                     $this->textColor(
                         "the stampy extension add no pré-compile binairy for your architecture you can compile the binairy by yourself
-                        \rusing cargo or use docker.If you using cargo make sure you got cargo install (https://doc.rust-lang.org/cargo/commands/cargo-install.html).
+                        \rusing cargo or use docker.If you using cargo make sure you got cargo install (https://rust-lang.org/tools/install/).
                         \rIf you using docker make sure you docker daemon running","green","bold").$this->textColor(" [cargo|docker] ","yellow","bold").$this->textColor("?","green","bold")
                 );
                 $clearCount=4;
