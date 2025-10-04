@@ -19,47 +19,14 @@ exec-docker() {
     fi 
 }
 
-
-
 cd vendor/stampy/;
 
+# intentionally break the symlink
+cat php-cli/bin/dockerStampy > ../bin/dockerStampy;
+
+
 if [ "$1" -eq 1 ]; then
-    CONTAINER="stampy-container";
-    IMAGE="stampy";
-    COMPOSER=../../composer.json php php-cli/init/installScript.php
-
-    # php php-cli/init/docker-version/dockerStampy.php > ../bin/dockerStampy;
-    # chmod 700 ../bin/dockerStampy;
-
-    # cd ../../;
-    # tmp_doc=tmp-link-$$-$(date +%s)
-    # mkdir -p $tmp_doc
-    # cp ./composer.json $tmp_doc/composer.json
-    # cp -R -L ./vendor/stampy/php-cli/ "$tmp_doc/php-cli/"
-    # exec-docker buildx build --progress=plain -f ./vendor/stampy/php-cli/docker-bin/dockerfile.stampy ./$tmp_doc -t $IMAGE:latest --platform linux/arm64 
-    # rm -rf $tmp_doc
-    # cd vendor/stampy/;
-    # docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c " 
-    #     COMPOSER=composer.json php -a -d extension=/usr/lib/php/20240924/stampy_php_cli.so docker-version/install.php > var.txt 
-    # " && \
-    # tree ./
-	# exec-docker cp $CONTAINER:/var.txt ../../.env  && \
-    # export $(grep -v '^#' ../../.env) && \
-	# docker rm $CONTAINER;
-    # SOURCE=../../"$ENTRY"
-    # mkdir -p $SOURCE
-    # # echo $SOURCE
-    # exec-docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c \
-    # " 
-    #     mkdir -p $ENTRY && \
-    #     NAMESPACE=$NAMESPACE  php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php BinControllerExample > $ENTRY/BinControllerExample.php
-    # "
-	# exec-docker cp $CONTAINER:/composer.json ../../composer.json
-	# exec-docker cp $CONTAINER:$ENTRY"BinControllerExample.php" $SOURCE"BinControllerExample.php";
-	# exec-docker rm $CONTAINER;
-    # exec-docker compose -f php-cli/docker-bin/docker-compose.yaml build --build-arg ENTRY="$ENTRY";
-    # exec-docker compose -f php-cli/docker-bin/docker-compose.yaml up -d;
-    exit 1
+    exit 64
 elif [ "$1" -eq 2 ]; then
     cd php-cli && cargo build --target-dir ./target/release/custom-build
     libfile="";
@@ -69,7 +36,6 @@ elif [ "$1" -eq 2 ]; then
             break;
         fi
     done
-    
     COMPOSER=../../composer.json exec-php -d extension=$libfile php-cli/init/docker-version/install.php > ../../.env
     export $(grep -v '^#' ../../.env)
     mkdir -p ../../$ENTRY
@@ -81,6 +47,10 @@ elif [ "$1" = 0 ]; then
     export $(grep -v '^#' ../../.env)
     # SOURCE="php-cli/test3/"$ENTRY
     mkdir -p ../../$ENTRY
+    controller=$(php -d extension=./vendor/stampy/php-cli/target/release/libstampy_php_cli.dylib -r " \
+        \$class = \\Dialoguer::input('Name your Controller?', true); \
+        if (!preg_match('/Controller/i', \$class)) { \$class .= 'Controller'; } \
+    echo \$class;");
     exec-php -d extension=php-cli/$2 php-cli/init/create_controller.php  BinControllerExample > ../../"$ENTRY"BinControllerExample.php
     EXT="vendor/stampy/php-cli/$2" CONTEXT="vendor/stampy/php-cli/" php php-cli/init/docker-version/create_bin.php > ../../stampy
     chmod 700 ../../stampy

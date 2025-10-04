@@ -8,11 +8,9 @@ services:
         - linux/arm64
       args:
         ENTRY: ${ENTRY} 
-    command: ["tail", "-f", "/dev/null"]
+    command: ["sh", "-c", "composer dump-autoload && tail -f /dev/null"]
     volumes:
       - ${PROJECT_ROOT:-.}/${ENTRY}:/${ENTRY}
       - ${PROJECT_ROOT:-.}/.env:/.env
-    #   - vendor:/vendor
       - ${PROJECT_ROOT:-.}/composer.stampy.json:/composer.json
-      # - stam:/usr/local/bin/stampy
       - ${PROJECT_ROOT:-.}:/tmp

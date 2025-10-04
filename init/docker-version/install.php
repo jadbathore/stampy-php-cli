@@ -55,7 +55,7 @@ $confirm = false;
 $key;$value;
 $composer = new ComposerHandler(getenv("COMPOSER"));
 $ques1 = "In witch namespace do you want to use your command-line-interface ?";
-$ques2 = "Do you want to use";
+$ques2 = "Do you want to use the NameSpace";
 $ques3 = "Do you want to do this later ?";
 
 if (count($composer->getlist()) >= 2){
@@ -77,9 +77,26 @@ $composer->add("$stampy\\",$value."console/");
 $decode = json_encode($composer->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 file_put_contents(getenv("COMPOSER"),$decode);
 
+if (!isset($stream?->scripts)){
+    $composer->getStream()->scripts = new stdClass();
+}
+
+$composer->getStream()->{"scripts"}->dockerStampy =  "./vendor/bin/dockerStampy";
+$decode = json_encode($composer->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+file_put_contents(getenv("COMPOSER"),$decode);
+
+
 if(getenv("TRANSFERT")){
     $transfert_Json  = new ComposerHandler(getenv("TRANSFERT"));
     $transfert_Json->add("$stampy\\",$value."console/");
     $decode = json_encode($transfert_Json->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     file_put_contents(getenv("TRANSFERT"),$decode);
 }
+
+$class = \Dialoguer::input('Name your Controller?', true);
+if (!preg_match('/Controller/i',$class)) 
+{ 
+    $class .= 'Controller';
+} 
+
+echo "\nCONTROLLER=".$class;

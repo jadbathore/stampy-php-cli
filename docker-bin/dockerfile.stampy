@@ -10,8 +10,6 @@ RUN apt-get update && apt-get install -y \
     libclang-dev \
     tree;
 
-COPY . ./test 
-RUN  ls -l test
 COPY ./php-cli/init ./
 COPY ./php-cli/src ./rust/src
 COPY ./php-cli/Cargo.toml ./rust

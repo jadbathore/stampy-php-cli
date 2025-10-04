@@ -13,12 +13,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# # COPY ./composer.test.json ./composer.json
-
-
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN cp composer.stampy.json composer.json
 RUN composer install 
-
+RUN composer dump-autoload
 RUN chmod 777 usr/local/bin/stampy
 RUN chmod 777 index

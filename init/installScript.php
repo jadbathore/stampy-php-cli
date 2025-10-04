@@ -56,7 +56,6 @@ class ComposerHandler {
 
 
 $composer = new ComposerHandler(getenv("COMPOSER"));
-
 $composer->add(getenv("NAMESPACE"),getenv("ENTRY"));
 $decode = json_encode($composer->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 echo $decode;

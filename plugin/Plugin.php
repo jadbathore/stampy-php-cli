@@ -49,10 +49,17 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
                     $io->write("\n\t✨welcome to Stampy!✨\n");
                     $this->color("Stampy successfully install","green");
                 break;
+                case 64:
+                    exec("tty",$tty);
+                    $tty = implode("",$tty);
+                    $output = shell_exec("./vendor/bin/dockerStampy < $tty > $tty 2>&1");
+                    $io->write($output);
+                break;
                 case 130:
                     $io->writeError(
                         $this->textColor("You prematurely stopped the shell script during the installation of Stampy","bgred")
                     );
+                
                 case 2:
                 default:
                     // echo $code;
