@@ -10,14 +10,6 @@ exec-php() {
     fi 
 }
 
-exec-docker() {
-    local script=$@;
-    docker $script;
-    result=$?;
-    if [ "$result" -eq 130 ]; then
-        exit 130 
-    fi 
-}
 
 cd vendor/stampy/;
 
@@ -38,22 +30,15 @@ elif [ "$1" -eq 2 ]; then
     done
     COMPOSER=../../composer.json exec-php -d extension=$libfile php-cli/init/docker-version/install.php > ../../.env
     export $(grep -v '^#' ../../.env)
-    mkdir -p ../../$ENTRY
-    exec-php -d extension=$libfile php-cli/init/create_controller.php  BinControllerExample > ../../"$ENTRY"BinControllerExample.php
+    mkdir -p ../../$ENTRY;
+    exec-php -d extension=$libfile php-cli/init/create_controller.php  $CONTROLLER > ../../$ENTRY$CONTROLLER.php
     EXT="$libfile" exec-php php-cli/init/docker-version/create_bin.php > ../../stampy
-    exit 1
 elif [ "$1" = 0 ]; then
-    COMPOSER=../../composer.json exec-php -d extension=php-cli/$2 php-cli/init/docker-version/install.php > ../../.env
+    COMPOSER=../../composer.json php -d extension=php-cli/$2 php-cli/init/docker-version/install.php > ../../.env
     export $(grep -v '^#' ../../.env)
-    # SOURCE="php-cli/test3/"$ENTRY
-    mkdir -p ../../$ENTRY
-    controller=$(php -d extension=./vendor/stampy/php-cli/target/release/libstampy_php_cli.dylib -r " \
-        \$class = \\Dialoguer::input('Name your Controller?', true); \
-        if (!preg_match('/Controller/i', \$class)) { \$class .= 'Controller'; } \
-    echo \$class;");
-    exec-php -d extension=php-cli/$2 php-cli/init/create_controller.php  BinControllerExample > ../../"$ENTRY"BinControllerExample.php
+    mkdir -p ../../$ENTRY;
+    php -d extension=php-cli/$2 php-cli/init/create_controller.php $CONTROLLER > ../../$ENTRY$CONTROLLER.php
     EXT="vendor/stampy/php-cli/$2" CONTEXT="vendor/stampy/php-cli/" php php-cli/init/docker-version/create_bin.php > ../../stampy
     chmod 700 ../../stampy
-    exit 1
 fi
 exit 2;

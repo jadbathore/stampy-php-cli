@@ -45,7 +45,7 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
 
         register_shutdown_function(function() use (&$code,&$io){
             switch($code){
-                case 1;
+                case 0;
                     $io->write("\n\t✨welcome to Stampy!✨\n");
                     $this->color("Stampy successfully install","green");
                 break;
@@ -59,8 +59,6 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
                     $io->writeError(
                         $this->textColor("You prematurely stopped the shell script during the installation of Stampy","bgred")
                     );
-                
-                case 2:
                 default:
                     // echo $code;
                     $io->writeError(

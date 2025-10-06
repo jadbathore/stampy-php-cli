@@ -1,35 +1,41 @@
 #!/bin/bash
 
-tmp_doc=tmp-link-$$-$(date +%s)
-mkdir -p $tmp_doc
-
-unlink(){
-    cp ./composer.json $tmp_doc/composer.json
-    cp -R -L ./vendor/stampy/php-cli/ "$tmp_doc/php-cli/"
-}
-spinner="/|\\-";
-i=1;
-
-CONTAINER="stampy-container";
+CONTAINER="stampy-container-tmp";
 IMAGE="stampy";
 
-unlink & 
-pid=$!
+if [ -L "./vendor/stampy/php-cli" ]; then
+    echo "./php-cli est un lien symbolique"
+    tmp_doc=tmp-link-$$-$(date +%s)
+    mkdir -p $tmp_doc
 
-while kill -0 "$pid" 2>/dev/null;do
-    i=$(((i + 1) % 4 ))
-    printf "\r[%c] Copy of the symlinkfile..." "$(echo "$spinner"| cut -c $((i + 1)))"
-    sleep 0.1
-done
+    unlink(){
+        cp ./composer.json $tmp_doc/composer.json
+        cp -R -L ./vendor/stampy/php-cli/ "$tmp_doc/php-cli/"
+    }
+    spinner="/|\\-";
+    i=1;
 
-printf "\r\033[2K[✓] Done.\n"
+    unlink & 
+    pid=$!
 
+    while kill -0 "$pid" 2>/dev/null; do
+        i=$(((i + 1) % 4 ))
+        printf "\r[%c] Copy of the symlinkfile..." "$(echo "$spinner"| cut -c $((i + 1)))"
+        sleep 0.1
+    done
+    printf "\r\033[2K[✓] Done.\n"
+    docker buildx build -f ./vendor/stampy/php-cli/docker-bin/dockerfile.stampy ./$tmp_doc -t $IMAGE:latest --platform linux/arm64
+    rm -rf $tmp_doc; 
+else
+    cp ./composer.json ./vendor/stampy/composer.json
+    docker buildx build -f ./vendor/stampy/php-cli/docker-bin/dockerfile.stampy ./vendor/stampy -t $IMAGE:latest --platform linux/arm64 
+    rm ./vendor/stampy/composer.json
+fi
 
-docker buildx build -f ./vendor/stampy/php-cli/docker-bin/dockerfile.stampy ./$tmp_doc -t $IMAGE:latest --platform linux/arm64 
 docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c "
 	COMPOSER=composer.json TRANSFERT=composer.stampy.json php -d extension=/usr/lib/php/20240924/stampy_php_cli.so docker-version/install.php > var.txt
 ";
-rm -rf $tmp_doc;
+
 docker cp $CONTAINER:/var.txt .env && \
 docker cp $CONTAINER:/composer.stampy.json composer.stampy.json && \
 docker cp $CONTAINER:/composer.json composer.json;
@@ -42,9 +48,10 @@ docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c
     mkdir -p $ENTRY && \
     NAMESPACE=$NAMESPACE php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php $CONTROLLER > $ENTRY$CONTROLLER.php;
 ";
-docker cp $CONTAINER:"$ENTRY"$CONTROLLER.php "$ENTRY"$CONTROLLER.php;
-docker rm $CONTAINER;
 
-PROJECT_ROOT=$(pwd) docker compose -f ./vendor/stampy/php-cli/docker-bin/docker-compose.yaml build --build-arg ENTRY=$ENTRY;
-PROJECT_ROOT=$(pwd) docker compose -f ./vendor/stampy/php-cli/docker-bin/docker-compose.yaml up -d;
+docker cp $CONTAINER:$ENTRY$CONTROLLER.php $ENTRY$CONTROLLER.php;
+docker rm $CONTAINER;
+PROJECT_NAME=stampy-$(pwd | sed 's/\//-/g' | tr 'A-Z' 'a-z');
+PROJECT_ROOT=$(pwd) docker compose --project-name "$PROJECT_NAME" -f ./vendor/stampy/php-cli/docker-bin/docker-compose.yaml build --build-arg ENTRY=$ENTRY;
+PROJECT_ROOT=$(pwd) docker compose --project-name "$PROJECT_NAME" -f ./vendor/stampy/php-cli/docker-bin/docker-compose.yaml up -d;
 

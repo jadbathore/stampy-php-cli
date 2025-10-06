@@ -82,6 +82,7 @@ if (!isset($stream?->scripts)){
 }
 
 $composer->getStream()->{"scripts"}->dockerStampy =  "./vendor/bin/dockerStampy";
+$composer->getStream()->{"scripts"}->execdockerStampy =  "./vendor/bin/execDockerStampy";
 $decode = json_encode($composer->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 file_put_contents(getenv("COMPOSER"),$decode);
 
