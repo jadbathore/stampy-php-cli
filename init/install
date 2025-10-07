@@ -13,14 +13,15 @@ exec-php() {
 
 cd vendor/stampy/;
 
-# intentionally break the symlink
+# intentionally break the symlink if there one ;
 cat php-cli/bin/dockerStampy > ../bin/dockerStampy;
 
 
 if [ "$1" -eq 1 ]; then
     exit 64
 elif [ "$1" -eq 2 ]; then
-    cd php-cli && cargo build --target-dir ./target/release/custom-build
+    cd php-cli && cargo build --target-dir ./target/release/custom-build;
+    cd ../
     libfile="";
     for file in $(find ./php-cli/target/release/custom-build/release -type f); do
         if [[ "$file" =~ ^./php-cli/target/release/custom-build/release/libstampy_php_cli.(so|dylib|dll)$ ]]; then
@@ -32,7 +33,9 @@ elif [ "$1" -eq 2 ]; then
     export $(grep -v '^#' ../../.env)
     mkdir -p ../../$ENTRY;
     exec-php -d extension=$libfile php-cli/init/create_controller.php  $CONTROLLER > ../../$ENTRY$CONTROLLER.php
-    EXT="$libfile" exec-php php-cli/init/docker-version/create_bin.php > ../../stampy
+    EXT="$libfile" CONTEXT="vendor/stampy/php-cli/" exec-php php-cli/init/docker-version/create_bin.php > ../../stampy
+    chmod 700 ../../stampy
+    exit 0
 elif [ "$1" = 0 ]; then
     COMPOSER=../../composer.json php -d extension=php-cli/$2 php-cli/init/docker-version/install.php > ../../.env
     export $(grep -v '^#' ../../.env)
@@ -40,5 +43,6 @@ elif [ "$1" = 0 ]; then
     php -d extension=php-cli/$2 php-cli/init/create_controller.php $CONTROLLER > ../../$ENTRY$CONTROLLER.php
     EXT="vendor/stampy/php-cli/$2" CONTEXT="vendor/stampy/php-cli/" php php-cli/init/docker-version/create_bin.php > ../../stampy
     chmod 700 ../../stampy
+    exit 0
 fi
 exit 2;
