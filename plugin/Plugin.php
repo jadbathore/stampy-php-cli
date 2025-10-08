@@ -29,7 +29,7 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
         $config = $event->getComposer()->getConfig();
         $vendorDir = $config->get('vendor-dir'); 
         $json = json_decode(file_get_contents(dirname($vendorDir)."/composer.json"));
-        $stampy = $json?->{"stamy"} ?? true;
+        $stampy = $json?->{"stampy"} ?? true;
         if($stampy?->rebuild_after_install_or_update ?? $stampy){ 
             $this->install_update($event);
         }
@@ -38,8 +38,6 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
     private function install_update(Event $event)
     {
         $io = $event->getIO();
-        exec("vendor/stampy/php-cli/init/preCompileOption",$precompileOutput,result_code:$preCompileCode);
-        $io->write($precompileOutput);
         $this->handlePreCompile($io,$exitCode,$pathExt);
         $output = exec("vendor/stampy/php-cli/init/install \"$exitCode\" $pathExt",result_code:$code);
         register_shutdown_function(function() use (&$code,&$io){

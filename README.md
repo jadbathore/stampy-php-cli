@@ -83,11 +83,11 @@ Then, once your custom Stampy container has been created, type the following com
 ```bash
   composer execdockerStamy
 ```
-Cela ouvirirant un shell dans votre terminal dans ce shell tapper 
+This will open a shell in your terminal in this shell type
 ```bash
   stampy
 ```
-vous verriez surment quelque chose comme ça s'affiche :
+You would probably see something like this displayed:
 ```md
 ================================================================================
 Command:bin
@@ -111,7 +111,7 @@ It is inside this Namespace that you could use the controllers allowing you to a
 NAMESPACE=StampyConsole
 ENTRY=src/console/
 ```
-Si l'emplacement du controlleur ne vous convient pas vous pouviez toujours le changer par exemple 
+If the location of the controller does not suit you, you can always change it, for example
 ```.env
 NAMESPACE=App
 ENTRY=src/
@@ -120,6 +120,18 @@ ENTRY=src/
 > [!WARNING]
 > Because Stampy verifies every class and method in the namespace used, it's important to use only controllers that allow Stampy to be used 
 > in this namespace to avoid unnecessary verification during plugin execution.
+
+You also have stampy parameter created automatically in your installation.
+```json
+  "stampy": {
+      "rebuild_after_install_or_update": false
+  }
+```
+The following setting will allow you to rebuild your stampy plugin each time you call `composer install` or `composer update`. This behavior can be annoying, so it is set to false.
+
+> [!WARNING]
+> If this setting does not exist in your `composer.json` file the behavior will be considered true
+
 ## Use
 
 Using the plugin is quite simple in the namespace you had assigned in your `.env` folder create a class using the following attributes.
