@@ -1,54 +1,55 @@
 #!/bin/bash
 
-system_finder(){
-    local ARCH=$(uname -m)
-    local OS=$(uname -s)
-    case $OS in 
-        Darwin)
-        case $ARCH in 
-            # arm64|aarch64)
-            #     export LIB_STAMPY="target/release/libstampy_php_cli.dylib"
-            # ;;
-            x86_64)
-                export LIB_STAMPY="target/x86_64-apple-darwin/libstampy_php_cli.dylib"
-            ;;
-            *)
-                exit 148
-
-        esac
+ARCH=$(uname -m)
+OS=$(uname -s)
+case $OS in 
+    Darwin)
+    case $ARCH in 
+        arm64|aarch64)
+            export LIB_STAMPY="target/release/libstampy_php_cli.dylib"
         ;;
-        Linux)
-        case $ARCH in 
-            amd64)
-                export LIB_STAMPY="target/release/aarch64-unknown-linux-gnu/libstampy_php_cli.so"
-            ;;
-            arm64)
-                export LIB_STAMPY="target/release/x86_64-unknown-linux-gnu/libstampy_php_cli.so"
-            ;;
-            *)
-                exit 148
-
-        esac
-        ;;
-        CYGWIN_NT-*|MSYS_NT-*|MSYS_NT-*|Windows_NT)
-        case $ARCH in 
-            x86_64)
-                export LIB_STAMPY="target/release/x86_64-pc-windows-gnu/release/libstampy_php_cli.dll"
-            ;;
-            *)
-                exit 148
-        esac
+        x86_64)
+            export LIB_STAMPY="target/x86_64-apple-darwin/libstampy_php_cli.dylib"
         ;;
         *)
             exit 148
+
     esac
-}
+    ;;
+    Linux)
+    case $ARCH in 
+        amd64)
+            export LIB_STAMPY="target/release/aarch64-unknown-linux-gnu/libstampy_php_cli.so"
+        ;;
+        arm64)
+            export LIB_STAMPY="target/release/x86_64-unknown-linux-gnu/libstampy_php_cli.so"
+        ;;
+        *)
+            exit 148
 
-system_finder;
+    esac
+    ;;
+    # CYGWIN_NT-*|MSYS_NT-*|MSYS_NT-*|Windows_NT)
+    # case $ARCH in 
+    #     x86_64)
+    #         export LIB_STAMPY="target/release/x86_64-pc-windows-gnu/release/libstampy_php_cli.dll"
+    #     ;;
+    #     *)
+    #         exit 148
+    # esac
+    # ;;
+    # *)
+    #     exit 148
+esac
 
-extcom=$([[ $LIB_STAMPY ]] && echo "-d extension=vendor/stampy/php-cli/$LIB_STAMPY");
+extcom="";
+if [ -n "$LIB_STAMPY" ]; then
+    extcom="-d extension=vendor/stampy/php-cli/$LIB_STAMPY"
+fi
+
 php $extcom vendor/stampy/php-cli/init/preCompileOption.php;
 php_result=$?;
+
 if [ "$php_result" -eq 0 ]; then 
     echo "$LIB_STAMPY"
 fi

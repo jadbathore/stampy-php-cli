@@ -83,7 +83,11 @@ if (!isset($stream?->scripts)){
 
 $composer->getStream()->{"scripts"}->dockerStampy =  "./vendor/bin/dockerStampy";
 $composer->getStream()->{"scripts"}->execdockerStampy =  "./vendor/bin/execDockerStampy";
+$composer->getStream()->stampy = new stdClass();
+$composer->getStream()->{"stampy"}->rebuild_after_install_or_update = false;
 $decode = json_encode($composer->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+
 file_put_contents(getenv("COMPOSER"),$decode);
 
 
@@ -95,7 +99,7 @@ if(getenv("TRANSFERT")){
 }
 
 $class = \Dialoguer::input('Name your Controller?', true);
-if (!preg_match('/Controller/i',$class)) 
+if (!preg_match('/controller/i',$class)) 
 { 
     $class .= 'Controller';
 } 

@@ -1,7 +1,5 @@
 <?php
 
-
-
 echo implode("\n",[
     "#!/bin/bash",
     "export $(grep -v '^#' .env )",
@@ -23,7 +21,7 @@ echo implode("\n",[
     "\t".'local ERR="$3";',
     "\t".'local IN="$4";',
     "\t".'local rest=(${@:7});',
-    "\t".'ERR=$([[ "$3" != "#" ]] && echo "2>'.getenv("OUTPUT").' $3");',
+    "\t".'ERR=$([[ "$3" != "#" ]] && echo "2>'.getenv("OUTPUT").'$3");',
     "\t".'IN=$([[ "$4" != "#" ]] && echo "< '.getenv("OUTPUT").'$4");',
     "\t".'OUT=$([[ "$5" != "#" ]] && echo "> '.getenv("OUTPUT").'$5");',
     "\t".'eval "CLASS=\"$class\" METHOD=\"$method\" php -d $ext '. getenv("CONTEXT").'index $(implode " " ${rest[@]}) $IN $OUT $ERR"',

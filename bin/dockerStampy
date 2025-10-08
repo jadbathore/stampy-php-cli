@@ -1,10 +1,21 @@
 #!/bin/bash
 
-CONTAINER="stampy-container-tmp";
+
+NAME=$(pwd |cut -c2- | sed 's/\//-/g' | tr 'A-Z' 'a-z');
+PROJECT_NAME=stampy-$NAME;
 IMAGE="stampy";
+max_length=128;
+TAG=$(basename $PWD)-$$-$(date +%s);
+TMP_CONTAINER="stampy_container"
+
+if [ ${#TAG} -gt $max_length ]; then
+  allowed_base_length=$((max_length - ${#IMAGE} - 1))
+  TAG=$(echo "$TAG" | cut -c1-"$allowed_base_length")
+fi
+
+FULL_IMAGE_NAME=$IMAGE:$TAG
 
 if [ -L "./vendor/stampy/php-cli" ]; then
-    echo "./php-cli est un lien symbolique"
     tmp_doc=tmp-link-$$-$(date +%s)
     mkdir -p $tmp_doc
 
@@ -24,34 +35,36 @@ if [ -L "./vendor/stampy/php-cli" ]; then
         sleep 0.1
     done
     printf "\r\033[2K[✓] Done.\n"
-    docker buildx build -f ./vendor/stampy/php-cli/docker-bin/dockerfile.stampy ./$tmp_doc -t $IMAGE:latest --platform linux/arm64
+    docker buildx build -f ./vendor/stampy/php-cli/docker-bin/dockerfile.stampy ./$tmp_doc -t $FULL_IMAGE_NAME --platform linux/arm64 --no-cache
     rm -rf $tmp_doc; 
 else
     cp ./composer.json ./vendor/stampy/composer.json
-    docker buildx build -f ./vendor/stampy/php-cli/docker-bin/dockerfile.stampy ./vendor/stampy -t $IMAGE:latest --platform linux/arm64 
+    docker buildx build -f ./vendor/stampy/php-cli/docker-bin/dockerfile.stampy ./vendor/stampy -t $FULL_IMAGE_NAME --platform linux/arm64 --no-cache
     rm ./vendor/stampy/composer.json
 fi
-
-docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c "
-	COMPOSER=composer.json TRANSFERT=composer.stampy.json php -d extension=/usr/lib/php/20240924/stampy_php_cli.so docker-version/install.php > var.txt
+docker run -it --platform linux/arm64 --name $TMP_CONTAINER $FULL_IMAGE_NAME /bin/sh -c "
+	COMPOSER=composer.json TRANSFERT=composer.stampy.json php -d extension=/usr/lib/php/20240924/stampy_php_cli.so init/docker-version/install.php > var.txt
 ";
 
-docker cp $CONTAINER:/var.txt .env && \
-docker cp $CONTAINER:/composer.stampy.json composer.stampy.json && \
-docker cp $CONTAINER:/composer.json composer.json;
+docker cp $TMP_CONTAINER:/var.txt .env && \
+docker cp $TMP_CONTAINER:/composer.stampy.json composer.stampy.json && \
+docker cp $TMP_CONTAINER:/composer.json composer.json;
 export $(grep -v '^#' .env); 
 mkdir -p $ENTRY;
-docker rm $CONTAINER;
+docker rm $TMP_CONTAINER;
 
-docker run -it --platform linux/arm64 --name $CONTAINER $IMAGE:latest /bin/sh -c \
+docker run -it --platform linux/arm64 --name $TMP_CONTAINER $FULL_IMAGE_NAME /bin/sh -c \
 "
     mkdir -p $ENTRY && \
-    NAMESPACE=$NAMESPACE php -d extension=/usr/lib/php/20240924/stampy_php_cli.so create_controller.php $CONTROLLER > $ENTRY$CONTROLLER.php;
+    NO_COPY=true NAMESPACE=$NAMESPACE php -d extension=/usr/lib/php/20240924/stampy_php_cli.so init/create_controller.php $CONTROLLER > $ENTRY$CONTROLLER.php;
 ";
 
-docker cp $CONTAINER:$ENTRY$CONTROLLER.php $ENTRY$CONTROLLER.php;
-docker rm $CONTAINER;
-PROJECT_NAME=stampy-$(pwd | sed 's/\//-/g' | tr 'A-Z' 'a-z');
-PROJECT_ROOT=$(pwd) docker compose --project-name "$PROJECT_NAME" -f ./vendor/stampy/php-cli/docker-bin/docker-compose.yaml build --build-arg ENTRY=$ENTRY;
-PROJECT_ROOT=$(pwd) docker compose --project-name "$PROJECT_NAME" -f ./vendor/stampy/php-cli/docker-bin/docker-compose.yaml up -d;
+docker cp $TMP_CONTAINER:$ENTRY$CONTROLLER.php $ENTRY$CONTROLLER.php;
+docker rm $TMP_CONTAINER;
 
+export TAG=$TAG 
+export CONTAINER_NAME=$PROJECT_NAME 
+export PROJECT_ROOT=$(pwd) 
+
+docker compose --project-name "$PROJECT_NAME" -f ./vendor/stampy/php-cli/docker-bin/docker-compose.yaml  build --no-cache --build-arg ENTRY=$ENTRY --build-arg CONTAINER_NAME=$PROJECT_NAME;
+docker compose --project-name "$PROJECT_NAME" -f ./vendor/stampy/php-cli/docker-bin/docker-compose.yaml  up -d;

@@ -12,37 +12,36 @@ use Composer\Script\Event;
 class Plugin implements PluginInterface,EventSubscriberInterface {
 
     use Coloring;
-    public function activate(Composer $composer, IOInterface $io)
-    {
 
-    }
-
-    public function deactivate(Composer $composer, IOInterface $io)
-    {
-        
-    }
-
-    public function uninstall(Composer $composer, IOInterface $io)
-    {
-        
-    }
+    public function activate(Composer $composer, IOInterface $io){}
+    public function deactivate(Composer $composer, IOInterface $io){}
+    public function uninstall(Composer $composer, IOInterface $io){}
 
     public static function getSubscribedEvents()
     {
         return [
-            'post-install-cmd' => 'install_update',
-            'post-update-cmd' => 'install_update',
+            'post-install-cmd' => 'build',
+            'post-update-cmd' => 'build',
         ];
     }
 
-    public function install_update(Event $event)
+    public function build(Event $event){
+        $config = $event->getComposer()->getConfig();
+        $vendorDir = $config->get('vendor-dir'); 
+        $json = json_decode(file_get_contents(dirname($vendorDir)."/composer.json"));
+        $stampy = $json?->{"stamy"} ?? true;
+        if($stampy?->rebuild_after_install_or_update ?? $stampy){ 
+            $this->install_update($event);
+        }
+    }
+
+    private function install_update(Event $event)
     {
         $io = $event->getIO();
-        // exec("vendor/stampy/php-cli/init/preCompileOption",$precompileOutput,result_code:$preCompileCode);
-        // $io->write($precompileOutput);
+        exec("vendor/stampy/php-cli/init/preCompileOption",$precompileOutput,result_code:$preCompileCode);
+        $io->write($precompileOutput);
         $this->handlePreCompile($io,$exitCode,$pathExt);
         $output = exec("vendor/stampy/php-cli/init/install \"$exitCode\" $pathExt",result_code:$code);
-
         register_shutdown_function(function() use (&$code,&$io){
             switch($code){
                 case 0;
@@ -60,20 +59,18 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
                         $this->textColor("You prematurely stopped the shell script during the installation of Stampy","bgred")
                     );
                 default:
-                    // echo $code;
                     $io->writeError(
                         $this->textColor("unable to install stampy due to a installation error exitCode:$code","bgred")
                     );
-                    // exit;
             }
         });
-
         $io->write($output);
     }
 
     private function handlePreCompile(\Composer\IO\IOInterface $io,int|null &$exitCode,string|null &$code = ""):void
     {
         exec("vendor/stampy/php-cli/init/preCompileOption",output:$out,result_code:$preCompileCode);
+        $io->write($preCompileCode);
         switch($preCompileCode){
             case 148:
                 $input = $io->ask(
@@ -104,7 +101,6 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
                 $code = implode($out);
             break;
             default:
-            
             $io->writeError(
                 $this->textColor("unable to use the shell the configure the pre-compile binairy exit code :$preCompileCode","bgred")
             );

@@ -13,9 +13,6 @@
     "bin": [
         "bin/dockerStampy"
     ],
-    "scripts":{
-        "bin":"echo \"test\""
-    },
     "authors": [
         {
             "name": "jadbathore"

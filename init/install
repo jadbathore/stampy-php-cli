@@ -15,7 +15,10 @@ cd vendor/stampy/;
 
 # intentionally break the symlink if there one ;
 cat php-cli/bin/dockerStampy > ../bin/dockerStampy;
-
+echo "#!/bin/bash" > ../bin/execdockerStampy;
+echo "PROJECT_NAME=stampy-\$(pwd |cut -c2- | sed 's/\//-/g' | tr 'A-Z' 'a-z');" >> ../bin/execdockerStampy;
+echo "docker exec -it \$PROJECT_NAME sh" >> ../bin/execdockerStampy;
+chmod 700 ../bin/execdockerStampy;
 
 if [ "$1" -eq 1 ]; then
     exit 64
@@ -32,15 +35,16 @@ elif [ "$1" -eq 2 ]; then
     COMPOSER=../../composer.json exec-php -d extension=$libfile php-cli/init/docker-version/install.php > ../../.env
     export $(grep -v '^#' ../../.env)
     mkdir -p ../../$ENTRY;
-    exec-php -d extension=$libfile php-cli/init/create_controller.php  $CONTROLLER > ../../$ENTRY$CONTROLLER.php
-    EXT="$libfile" CONTEXT="vendor/stampy/php-cli/" exec-php php-cli/init/docker-version/create_bin.php > ../../stampy
+    exec-php -d extension=$libfile php-cli/init/create_controller.php  $CONTROLLER > ../../$ENTRY$CONTROLLER.php;
+    EXT_USABLE=vendor/stampy/$(echo "$libfile" | sed 's/.\/php-cli/php-cli/g');
+    EXT=$EXT_USABLE CONTEXT="vendor/stampy/php-cli/" exec-php php-cli/init/docker-version/create_bin.php > ../../stampy
     chmod 700 ../../stampy
     exit 0
 elif [ "$1" = 0 ]; then
-    COMPOSER=../../composer.json php -d extension=php-cli/$2 php-cli/init/docker-version/install.php > ../../.env
+    COMPOSER=../../composer.json exec-php -d extension=php-cli/$2 php-cli/init/docker-version/install.php > ../../.env
     export $(grep -v '^#' ../../.env)
     mkdir -p ../../$ENTRY;
-    php -d extension=php-cli/$2 php-cli/init/create_controller.php $CONTROLLER > ../../$ENTRY$CONTROLLER.php
+    exec-php -d extension=php-cli/$2 php-cli/init/create_controller.php $CONTROLLER > ../../$ENTRY$CONTROLLER.php
     EXT="vendor/stampy/php-cli/$2" CONTEXT="vendor/stampy/php-cli/" php php-cli/init/docker-version/create_bin.php > ../../stampy
     chmod 700 ../../stampy
     exit 0

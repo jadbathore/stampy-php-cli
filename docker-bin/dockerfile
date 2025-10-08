@@ -1,10 +1,10 @@
 ARG BUILDPLATFORM
+ARG TAG
+
+FROM --platform=$BUILDPLATFORM stampy:${TAG} 
 
 
-FROM --platform=$BUILDPLATFORM stampy:latest 
-
-
-RUN EXT="/usr/lib/php/20240924/stampy_php_cli.so" OUTPUT="tmp/" php docker-version/create_bin.php > usr/local/bin/stampy
+RUN EXT="/usr/lib/php/20240924/stampy_php_cli.so" OUTPUT="tmp/" php init/docker-version/create_bin.php > usr/local/bin/stampy
 # # ENTRYPOINT ["stampy"];
 
 RUN apt-get update && apt-get install -y \
@@ -19,3 +19,4 @@ RUN composer install
 RUN composer dump-autoload
 RUN chmod 777 usr/local/bin/stampy
 RUN chmod 777 index
+RUN rm -rf init

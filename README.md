@@ -7,6 +7,11 @@ Is a composer plugin that makes it easier to use the PHP command prompt in your 
 > [!TIP]
 > Composer will probably ask you if you want to authorize during the installation. By this message
 
+To start the installation of this project through composer, run the command:
+```bash
+composer require stampy/php-cli
+```
+
 ```bash
 Package operations: 1 install, 0 updates, 0 removals
 stampy/php-cli contains a Composer plugin which is currently not in your allow-plugins config. See https://getcomposer.org/allow-plugins
@@ -23,11 +28,6 @@ Repondez "y" a cette question.
             "stampy/php-cli": true
         }
     },
-```
-
-To start the installation of this project through composer, run the command:
-```bash
-composer require stampy/php-cli
 ```
 After installation, the plugin will check if a pre-compiled version of the stampy library is available for your architecture.
 ### If a pre-compiled version **exists** for your architecture
@@ -63,11 +63,12 @@ No problem thanks to cargo a compilation of the stampy library will be carried o
 
 ### Docker 
 
-To use docker you just had to choose the option [use docker] or docker (if you did not have a pre-compiler). Otherwise a bash script will be created during the installation and you can at any time do the following command to containerize the plugin
+To use docker you just had to choose the option [use docker] or docker (if you did not have a pre-compiler). Otherwise a bash script will be created during the installation and you can at any time do the following command to containerize the plugin.
 
 ```bash
   composer dockerStampy
 ```
+
 > [!TIP]
 > Before running the drown command, make sure you're at the root of your Composer project, i.e.
 > the directive where PHP is located.
@@ -75,8 +76,24 @@ To use docker you just had to choose the option [use docker] or docker (if you d
 By following the installation process you arrive at the same result as for the other installation methods: the terminal asks you in which namespace you want to use stampy then creates in your app file a controller, an .env but also a composer.stampy.json file because stampy using docker has a composer.json totally separate from the composer of your application which allows you to completely separate what the plugin can do and what your application can do.
 
 > [!CAUTION]
-> Be careful of data overwriting when using this plugin. Due to its early development stage, it is still predetermined for all use cases such as counters.
-> This is not yet fully supported for separate projects, so for two separate projects in the same environment, it is important to take this into account.
+> When creating a new controller, be careful not to name your controller something other than an existing one, as this could overwrite your existing controller.
+
+Then, once your custom Stampy container has been created, type the following command in your terminal.
+
+```bash
+  composer execdockerStamy
+```
+Cela ouvirirant un shell dans votre terminal dans ce shell tapper 
+```bash
+  stampy
+```
+vous verriez surment quelque chose comme ça s'affiche :
+```md
+================================================================================
+Command:bin
+Description:---describe your command there---
+================================================================================
+```
 
 ## Composer.json post-install
 
@@ -94,7 +111,7 @@ It is inside this Namespace that you could use the controllers allowing you to a
 NAMESPACE=StampyConsole
 ENTRY=src/console/
 ```
-Si l'emplacement du controlleur ne vous convient pas vous pouviez toujour le changer par exemple 
+Si l'emplacement du controlleur ne vous convient pas vous pouviez toujours le changer par exemple 
 ```.env
 NAMESPACE=App
 ENTRY=src/
@@ -117,6 +134,9 @@ use Stampy\Model\Attributes\Option;
 use Stampy\Model\Attributes\StdErr;
 use Stampy\Model\Attributes\StdOut;
 use Stampy\Model\Attributes\StdIn;
+use \Dialoguer;
+use \NamespaceHandler;
+use \Indicatif;
 
 class BinController extends AbstractPrompsController
 {
@@ -151,8 +171,12 @@ class BinController extends AbstractPrompsController
 	){
 		/* --- example of use ---- */
     stream_get_contents(STDIN); // return the content of the input.json file;
-		echo "hello"; // will write in the file output.txt 
+		echo "hello"; // will write in the file output.txt in the root of your project
 		fwrite(STDERR,"log error"); // will write in the file error.log
+    $this->color("hello world!","green") // green text
+    $this->color("hello world!","bggreen") // green background
+    $this->color("hello world!","green","bold") // green text bold 
+    $this->color("hello world!","green","bold","underline") // green text bold and underline
     var_dump($option1,$option2) 
     /*
       |  input  (in terminal)         |  param      |  value  | 
@@ -170,6 +194,39 @@ class BinController extends AbstractPrompsController
       |  ./stampy bin -option2 abc    |  $option1   |  ERROR  |
     */
     getenv("ENTRY") // global env variable "ENTRY" which is found in the .env
+    /* --- the Foreign function interface (FFI)---- */
+    // There are 3 external classes exported from the binary that can be used in your project
+    /* 
+      First, Dialoguer from the cargo library https://docs.rs/dialoguer/latest/dialoguer/, which has been adapted for this specific use.
+      More information on its use can be found in the vendor/stampy/php-cli/app/FFI/Dialoguer.php folder.
+    */
+    $progress = $this->newProgressBar(100);
+		for ($i=0;$i<99;$i++){
+			$progress->increment();
+			sleep(1);
+		}
+		$progress->finishAndClear();
+    Dialoguer::input("Hi how are you ?",true) // input 
+    /* 
+      - Cargo library code: https://docs.rs/indice/latest/indice/, which has been adapted for this specific use.
+      More information on its use can be found in the vendor/stampy/php-cli/app/FFI/Indecatif folder.
+    */
+    /* the class Indicatif is alrealdy implement in the abstract class Stampy\Model\Abstract\AbstractPrompsController.php si you can you Indicatif like this */
+    $progress = $this->newProgressBar(100);
+		for ($i=0;$i<99;$i++){
+			$progress->increment();
+			sleep(1);
+		}
+		$progress->finishAndClear();
+    // will display a clean loading bar with 100 long length
+    // but you can use Indicatif with the same result as above
+    $progress = new Indicatif(100);
+
+    /* 
+        Namespace handler that allows you to return a well-formatted namespace array as well as add or subtract a level.
+        More information on its use can be found in the vendor/stampy/php-cli/app/FFI/NamespaceHandler.php folder.
+    */
+    $namespace = new NamespaceHandler(dirname(__DIR__,2)."scr/","App");
 	}
 }
 ```   

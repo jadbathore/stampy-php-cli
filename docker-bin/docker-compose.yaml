@@ -1,5 +1,6 @@
 services:
   stampy:
+    image: stampy:${TAG}
     container_name: ${CONTAINER_NAME}
     build:
       context: .
@@ -7,7 +8,7 @@ services:
       platforms:
         - linux/arm64
       args:
-        ENTRY: ${ENTRY} 
+        TAG: ${TAG}
     command: ["sh", "-c", "composer dump-autoload && tail -f /dev/null"]
     volumes:
       - ${PROJECT_ROOT:-.}/${ENTRY}:/${ENTRY}

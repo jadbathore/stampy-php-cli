@@ -2,7 +2,6 @@
 
 FROM --platform=$BUILDPLATFORM rust:latest 
 
-ARG TMP
 RUN apt-get update && apt-get install -y \
     php \
     php-cli \
@@ -10,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     libclang-dev \
     tree;
 
-COPY ./php-cli/init ./
+COPY ./php-cli/init ./init
 COPY ./php-cli/src ./rust/src
 COPY ./php-cli/Cargo.toml ./rust
 COPY ./php-cli/build.rs ./rust
@@ -24,4 +23,4 @@ COPY ./php-cli/app/Model ./app/Model
 RUN cd rust && cargo build --release 
 RUN cp -r rust/target/release/libstampy_php_cli.so /usr/lib/php/20240924/stampy_php_cli.so 
 RUN chmod 644 /usr/lib/php/20240924/stampy_php_cli.so;
-
+RUN rm -rf rust
