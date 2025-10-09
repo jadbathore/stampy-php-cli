@@ -8,7 +8,10 @@ use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
-
+use Composer\Console\Application;
+use stdClass;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 class Plugin implements PluginInterface,EventSubscriberInterface {
 
     use Coloring;
@@ -28,19 +31,20 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
     public function build(Event $event){
         $config = $event->getComposer()->getConfig();
         $vendorDir = $config->get('vendor-dir'); 
-        $json = json_decode(file_get_contents(dirname($vendorDir)."/composer.json"));
+        $pathComposer = dirname($vendorDir)."/composer.json";
+        $json = json_decode(file_get_contents($pathComposer));
         $stampy = $json?->{"stampy"} ?? true;
         if($stampy?->rebuild_after_install_or_update ?? $stampy){ 
-            $this->install_update($event);
+            $this->install_update($event,$json,$pathComposer);
         }
     }
 
-    private function install_update(Event $event)
+    private function install_update(Event $event,mixed $json,string $pathComposer)
     {
         $io = $event->getIO();
         $this->handlePreCompile($io,$exitCode,$pathExt);
         $output = exec("vendor/stampy/php-cli/init/install \"$exitCode\" $pathExt",result_code:$code);
-        register_shutdown_function(function() use (&$code,&$io){
+        register_shutdown_function(function() use (&$code,&$io,$json,$pathComposer){
             switch($code){
                 case 0;
                     $io->write("\n\t✨welcome to Stampy!✨\n");
@@ -48,7 +52,7 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
                 break;
                 case 64:
                     exec("tty",$tty);
-                    $tty = implode("",$tty);
+                    $tty = implode($tty);
                     $output = shell_exec("./vendor/bin/dockerStampy < $tty > $tty 2>&1");
                     $io->write($output);
                 break;
@@ -61,6 +65,23 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
                         $this->textColor("unable to install stampy due to a installation error exitCode:$code","bgred")
                     );
             }
+            if ($code == 0 || $code == 64){
+                $executableComposer = new Application();
+                $executableComposer->setAutoExit(false);
+                $input = new ArrayInput([
+                    'command' => 'dump-autoload',
+                    '--optimize' => true
+                ]);
+                $output = new BufferedOutput();
+                $executableComposer->run($input,$output);
+                $io->write("\n".$this->color($output->fetch(),"green"));
+                if(!isset($json?->{"stampy"}?->rebuild_after_install_or_update)){ 
+                    $json->stampy = new stdClass();
+                    $json->{"stampy"}->rebuild_after_install_or_update = false;
+                    $encode = json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                    file_put_contents($pathComposer,$encode);
+                }
+            }
         });
         $io->write($output);
     }
@@ -68,7 +89,6 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
     private function handlePreCompile(\Composer\IO\IOInterface $io,int|null &$exitCode,string|null &$code = ""):void
     {
         exec("vendor/stampy/php-cli/init/preCompileOption",output:$out,result_code:$preCompileCode);
-        $io->write($preCompileCode);
         switch($preCompileCode){
             case 148:
                 $input = $io->ask(

@@ -78,23 +78,6 @@ By following the installation process you arrive at the same result as for the o
 > [!CAUTION]
 > When creating a new controller, be careful not to name your controller something other than an existing one, as this could overwrite your existing controller.
 
-Then, once your custom Stampy container has been created, type the following command in your terminal.
-
-```bash
-  composer execdockerStamy
-```
-This will open a shell in your terminal in this shell type
-```bash
-  stampy
-```
-You would probably see something like this displayed:
-```md
-================================================================================
-Command:bin
-Description:---describe your command there---
-================================================================================
-```
-
 ## Composer.json post-install
 
 After installing the plugin your `composer.json` folder will have changed a little bit first a new namespace will be created
@@ -132,7 +115,39 @@ The following setting will allow you to rebuild your stampy plugin each time you
 > [!WARNING]
 > If this setting does not exist in your `composer.json` file the behavior will be considered true
 
-## Use
+### stampy's execution
+
+## In a local context
+
+After the local installation, a bash executable will be created in the form of a bash file named `stampy`. All you have to do is call it in this way:
+
+```bash
+  ./stampy
+```
+If you want to activate a particular command, write it below.
+```bash
+  ./stampy bin
+```
+This will activate the bin command of your controller if it exists if it does not then the default command will be called it will show you the commands available in your controller
+## In a containerize context
+
+Then, once your custom Stampy container has been created, type the following command in your terminal.
+
+```bash
+  composer execdockerStamy
+```
+This will open a docker shell in your terminal in this shell type
+```bash
+  stampy
+```
+You would probably see something like this displayed:
+```md
+================================================================================
+Command:bin
+Description:---describe your command there---
+================================================================================
+```
+
 
 Using the plugin is quite simple in the namespace you had assigned in your `.env` folder create a class using the following attributes.
 ```php
@@ -191,19 +206,19 @@ class BinController extends AbstractPrompsController
     $this->color("hello world!","green","bold","underline") // green text bold and underline
     var_dump($option1,$option2) 
     /*
-      |  input  (in terminal)         |  param      |  value  | 
-      |-------------------------------|-------------|---------|
-      |  ./stampy bin                 |  $option1   |  null   |
-      |-------------------------------|-------------|---------|
-      |  ./stampy bin                 |  $option2   |  null   |
-      |-------------------------------|-------------|---------|
-      |  ./stampy bin -option1        |  $option1   |  true   |
-      |-------------------------------|-------------|---------|
-      |  ./stampy bin -option2        |  $option2   |  true   |
-      |-------------------------------|-------------|---------|
-      |  ./stampy bin -option1 abc    |  $option1   |  "abc"  |
-      |-------------------------------|-------------|---------|
-      |  ./stampy bin -option2 abc    |  $option1   |  ERROR  |
+      |  input  (in docker shell)     |  input  (in local terminal)   |  param      |  value  | 
+      |-------------------------------|-------------------------------|-------------|---------|
+      |  stampy bin                   |  ./stampy bin                 |  $option1   |  null   |
+      |-------------------------------|-------------------------------|-------------|---------|
+      |  stampy bin                   |  ./stampy bin                 |  $option2   |  null   |
+      |-------------------------------|-------------------------------|-------------|---------|
+      |  stampy bin -option1          |  ./stampy bin -option1        |  $option1   |  true   |
+      |-------------------------------|-------------------------------|-------------|---------|
+      |  stampy bin -option2          |  ./stampy bin -option2        |  $option2   |  true   |
+      |-------------------------------|-------------------------------|-------------|---------|
+      |  stampy bin -option1 abc      |  ./stampy bin -option1 abc    |  $option1   |  "abc"  |
+      |-------------------------------|-------------------------------|-------------|---------|
+      |  stampy bin -option2 abc      |  ./stampy bin -option2 abc    |  $option1   |  ERROR  |
     */
     getenv("ENTRY") // global env variable "ENTRY" which is found in the .env
     /* --- the Foreign function interface (FFI)---- */

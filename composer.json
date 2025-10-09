@@ -6,7 +6,6 @@
     "autoload": {
         "psr-4": {
             "Stampy\\": "app/",
-            "Test\\": "app/Controller/",
             "Stampy\\Extension\\":"plugin/"
         }
     },

@@ -1,7 +1,5 @@
 <?php
 
-
-
 class ComposerHandler {
     private mixed $stream;
 
@@ -83,8 +81,6 @@ if (!isset($stream?->scripts)){
 
 $composer->getStream()->{"scripts"}->dockerStampy =  "./vendor/bin/dockerStampy";
 $composer->getStream()->{"scripts"}->execdockerStampy =  "./vendor/bin/execDockerStampy";
-$composer->getStream()->stampy = new stdClass();
-$composer->getStream()->{"stampy"}->rebuild_after_install_or_update = false;
 $decode = json_encode($composer->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
 

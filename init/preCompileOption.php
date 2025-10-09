@@ -8,6 +8,6 @@ if ($input == $select[1]){
     exit(1);
 }
 
-// if (php_sapi_name() !== 'cli') {
-//     exit(130);
-// }
+if (php_sapi_name() !== 'cli') {
+    exit(130);
+}
