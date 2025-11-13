@@ -19,6 +19,7 @@ COPY ./composer.json ./
 RUN mkdir app 
 COPY ./php-cli/index ./
 COPY ./php-cli/app/Model ./app/Model
+COPY ./php-cli/app/config.php ./app
 
 RUN cd rust && cargo build --release 
 RUN cp -r rust/target/release/libstampy_php_cli.so /usr/lib/php/20240924/stampy_php_cli.so 

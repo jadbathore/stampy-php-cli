@@ -2,7 +2,6 @@
 
 namespace Stampy\Model\Class\Object;
 
-use ReflectionAttribute;
 use Stampy\Model\Attributes\Command;
 use Stampy\Model\Attributes\Description;
 use Stampy\Model\Attributes\Option;
@@ -163,21 +162,21 @@ class Method_CLI implements MethodCLIInterface {
         foreach($this->method->getAttributes() as $attribut)
         {
             $this->toDisplay($attribut->getName())??
-            $this->color($this->getBaseName($attribut->getName()).":",$color,"underline","bold");
+            $this->colorOut($this->getBaseName($attribut->getName()).":",$color,"underline","bold");
             switch($attribut->getName())
             {
                 case Command::class:
-                    $this->color($this->getCommand(),$color,"italic");
+                    $this->colorOut($this->getCommand(),$color,"italic");
                 break;
                 case Option::class:
                     foreach ($this->getOptions() as $key => $value) {
                         if ($value instanceof Option_CLI){
-                            $this->color("\n\t<$key>: {$value->getDescription()}",$color,"italic");
+                            $this->colorOut("\n\t<$key>: {$value->getDescription()}",$color,"italic");
                         } 
                     }
                 break;
                 case Description::class:
-                    $this->color($this->getDescription(),$color,"italic");
+                    $this->colorOut($this->getDescription(),$color,"italic");
                 break;
             }
             echo $this->toDisplay($attribut->getName()) ?? PHP_EOL;

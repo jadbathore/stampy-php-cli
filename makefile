@@ -50,5 +50,7 @@ x84_64-win:
 clean:
 	docker system prune -a
 
-# Cible par défaut
+watch:
+	cargo watch -x "build --release"
+
 all: self linux x84_64-win

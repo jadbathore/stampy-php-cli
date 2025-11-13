@@ -35,7 +35,7 @@ interface Dialoguer {
      *  echo "welcome back $name" // welcome back marie
      * ```
      * @param string $input input question before interaction
-     * @param bool $theme optionnal $theme with default="false" colorful""
+     * @param bool $theme optionnal $theme with default="false" colorful="true"
      */
     public static function input(string $input,?Bool $theme=false):string;
 
@@ -43,7 +43,7 @@ interface Dialoguer {
      * ## password 
      * allow to ask user a password in the terminal 
      * @param string $input input question before interaction
-     * @param bool $theme optionnal $theme with default="false" colorful""
+     * @param bool $theme optionnal $theme with default="false" colorful="true"
      */
     public static function password(string $input,?Bool $theme=false):void;
 
@@ -74,8 +74,6 @@ interface Dialoguer {
      *  // [x] 1
      *  // [ ] 2
      *  // [ ] 3
-     *  //   Terrence Howard nonsence 
-     *  // you add the input "marie"
      *  var_dump($multiSelect) // Array (2) ["1","2"]
      * ```
      * @param string $input input question before interaction

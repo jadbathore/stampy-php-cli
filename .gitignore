@@ -7,3 +7,6 @@ Composer.lock
 /target/debug 
 /target/.rustc_info.json
 /target/release/
+test
+stampy
+.env

@@ -3,8 +3,8 @@ use crate::mod_traits::builder::class::{BuilderClass,BuilderWrapper};
 pub struct Director;
 
 impl Director {
-    pub fn construct_builder_class(builder: &mut impl BuilderClass,class_name:&str){
-        builder.set_class(class_name);
+    pub fn construct_builder_class(builder: &mut impl BuilderClass){
+        builder.set_class();
         builder.set_methods();
     }
 

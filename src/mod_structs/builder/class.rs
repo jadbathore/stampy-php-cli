@@ -226,9 +226,10 @@ impl<T> DialoguerBuilder<T> {
 impl BuilderClass for DialoguerBuilder<()> 
 {
     type OutputType = ClassEntity<()>;
+    const CLASS_NAME:&str = "Dialoguer";
 
-    fn set_class(&mut self,class_name:&str) { 
-        self.class = Some(ClassEntity::new(class_name));
+    fn set_class(&mut self) { 
+        self.class = Some(ClassEntity::new(Self::CLASS_NAME));
     }
 
     fn set_methods(&mut self) {

@@ -2,12 +2,15 @@
 use std::ffi::OsString;
 
 use phper::{
-    arrays::ZArray, classes::{ClassEntity,Visibility}, errors::ArgumentCountError, functions::{Argument,MethodEntity}, objects::StateObj, types::ArgumentTypeHint, values::ZVal
+    arrays::ZArray, classes::{ClassEntity,Visibility},
+    errors::ArgumentCountError, functions::{Argument,MethodEntity}, 
+    objects::StateObj, types::ArgumentTypeHint, values::ZVal
 };
 
 use crate::
     {
-        general, mod_enums::arguments::ArgumentUsageNamespaceHandler, mod_structs::namespace_buf::ClassesInNamespace, mod_traits
+        general, mod_enums::{arguments::ArgumentUsageNamespaceHandler, errors::class_error::StampyErrorKind}, 
+        mod_structs::namespace_buf::ClassesInNamespace, mod_traits
     };
 
 
@@ -42,8 +45,12 @@ where
     fn resolve(this:&mut StateObj<ClassesInNamespace<'b>>,_:&mut [ZVal])->Result<ZArray, phper::Error>
     {
         let class_in_namespace = this.as_mut_state();
-        let a = class_in_namespace.resolver()?;
-        Ok(a)
+        let try_z_array = class_in_namespace.resolver();
+        if let Err((path_buf,err)) = try_z_array {
+            let throwable = general::format_throwable_exception(path_buf,err,StampyErrorKind::EmptyNameSpace)?;
+            return Err(phper::Error::Throw(throwable));
+        }
+            Ok(try_z_array.unwrap())
     }
 
     fn previous(this:&mut StateObj<ClassesInNamespace<'b>>,_:&mut [ZVal])->Result<(), phper::Error>
@@ -67,8 +74,10 @@ where
                 Err(phper::Error::Throw(throwable))
             }
         })
-
     }
+
+    
+
 
     fn preformate_arguments<B>(arguments:&mut [ZVal],builder:B) -> Result<(),phper::Error>
     where 
@@ -97,7 +106,7 @@ where
             builder(OsString::from(path_arg))?;
             Ok(())
         } else {
-            Err(phper::Error::ArgumentCount(ArgumentCountError::new(String::from("push"), 2, arguments.iter().len())))
+            Err(phper::Error::ArgumentCount(ArgumentCountError::new(String::from("push"), 1, arguments.iter().len())))
         }
     }  
 }
@@ -119,10 +128,11 @@ impl<'a,T> NamespaceHandler<T> {
 
 impl<'a> BuilderClass for NamespaceHandler<ClassesInNamespace<'a>> 
 {
+    const CLASS_NAME:&'static str = "NamespaceHandler";
     type OutputType = ClassEntity<ClassesInNamespace<'a>>;
 
-    fn set_class(&mut self,class_name:&str) { 
-        self.class = Some(ClassEntity::new_with_state_constructor(class_name, ClassesInNamespace::new));
+    fn set_class(&mut self) { 
+        self.class = Some(ClassEntity::new_with_state_constructor(Self::CLASS_NAME, ClassesInNamespace::new));
     }
 
     fn set_methods(&mut self) {

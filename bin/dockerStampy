@@ -13,6 +13,8 @@ if [ ${#TAG} -gt $max_length ]; then
   TAG=$(echo "$TAG" | cut -c1-"$allowed_base_length")
 fi
 
+echo "\r"
+
 FULL_IMAGE_NAME=$IMAGE:$TAG
 
 if [ -L "./vendor/stampy/php-cli" ]; then

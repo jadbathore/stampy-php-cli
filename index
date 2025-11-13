@@ -2,12 +2,15 @@
 <?php
 
 require_once 'vendor/autoload.php';
+require_once 'app/config.php';
+
 
 use Stampy\Model\Class\ControllerHandler\BinControllerHandler;
 use Stampy\Model\Class\ControllerHandler\JumpStart;
-use Stampy\Model\Class\Singletone\ErrorHandler;
-use Stampy\Model\Class\Singletone\BinErrorHandler;
-use Stampy\Model\Class\throwable\binError;
+use Stampy\Model\Class\SingleTone\Errors\ErrorHandler;
+use Stampy\Model\Class\SingleTone\Errors\BinErrorHandler;
+use Stampy\Model\Class\Throwable\BinError;
+
 
 try{
     if(getenv("CLASS") && getenv("METHOD")){
@@ -16,12 +19,14 @@ try{
         $controllersNameSpace = new \NamespaceHandler("./".getenv("ENTRY"),getenv("NAMESPACE"));
         new BinControllerHandler($controllersNameSpace->resolve(),$argv)->start();
     }
-} catch(Error $e) {
-    $errorHandler = &ErrorHandler::instance($e);
+} catch(Error $err) {
+    $errorHandler = &ErrorHandler::instance($err);
     $errorHandler->debugInfo();
-} catch(binError $e) {
-    $errorHandler = &BinErrorHandler::instance($e);
-    $errorHandler->correction();
+} catch(binError $err) {
+    $binErrorHandler = &BinErrorHandler::instance();
+    $binErrorHandler->correctionInternalError($err);
+} catch(\StampyException $err){
+    $binErrorHandler = &BinErrorHandler::instance();
+    $binErrorHandler->correctionStampyError($err);
 }
-
 

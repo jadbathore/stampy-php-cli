@@ -148,7 +148,7 @@ Description:---describe your command there---
 ================================================================================
 ```
 
-
+## Controller usage
 Using the plugin is quite simple in the namespace you had assigned in your `.env` folder create a class using the following attributes.
 ```php
 namespace StampyConsole;
@@ -164,6 +164,7 @@ use Stampy\Model\Attributes\StdIn;
 use \Dialoguer;
 use \NamespaceHandler;
 use \Indicatif;
+use function Stampy\padding;
 
 class BinController extends AbstractPrompsController
 {
@@ -175,22 +176,33 @@ class BinController extends AbstractPrompsController
       /* Each option is linked to a parameter, so "option1" corresponds to the parameter.
       $option1 option1 is either:
       - null I didn't write the option (./stampy bin)
-      - bool(true) I wrote the option but didn't pass any input (./stampy bin -option1)
-      - string I wrote the option and passed an input (./stampy bin -option1 abc) Here, the value of $option1 = abc
+      - bool(true) I wrote the option but didn't pass any input 
+      (./stampy bin -option1)
+      - string I wrote the option and passed an input 
+      (./stampy bin -option1 abc) Here, the value of $option1 = abc
       Since Option_CLI has true as the first parameter, this means that this option accepts input.
       */
 			"-option2" => new Option_CLI(false,"---describe your option there---"),
       /*
-      So for the case of option 2 given that I have indicated by false in the Option_CLI class that I do not want input for this option $option2 can only be bool or null and therefore does not accept inputs an error is even sent if you all have an input for this file
+      So for the case of option 2 given that I have indicated by false in the Option_CLI class 
+      that I do not want input for this option $option2 can only be bool or null and therefore 
+      does not accept inputs an error is even sent if you all have an input for this file
       */
 		]),
     StdOut("output-file.txt"),
-    /* Corresponds to the assignment ">" to the call of a php file for example if you want to redistribute a data stream in a particular file in this case all your echo will be redistributed inside and visible output will be redistributed inside the file in question if a file does not exist it will be created automatically */
+    /* Corresponds to the assignment ">" to the call of a php file for example if you want 
+    to redistribute a data stream in a particular file in this case all your echo will be redistributed
+    inside and visible output will be redistributed inside the file in question if a file does 
+    not exist it will be created automatically */
 		Description('---describe your command there---'),
 		StdErr("error.log"),
-    /* Corresponds to the assignment "2>" when calling a php file, for example, if instead of outputting an error on a terminal you output it to this StdErr file, if a file does not exist it will be created automatically. */
-		StdIn("input-file.json"),
-    /* Corresponds to the assignment "<" to the call of a php file for example you wish to use from the STDIN stream to give another file for your script if there is no file a bash error will be raised telling you that you must first have a file at the origin to be able to use it correctly */
+    /* Corresponds to the assignment "2>" when calling a php file, for example,
+    if instead of outputting an error on a terminal you output it to this StdErr file,
+    if a file does not exist it will be created automatically. */
+		StdIn("input.json"),
+    /* Corresponds to the assignment "<" to the call of a php file for example you wish to use 
+    from the STDIN stream to give another file for your script if there is no file a bash error 
+    will be raised telling you that you must first have a file at the origin to be able to use it correctly */
 	]
 	public function bin(
 		null|bool|string $option1,
@@ -224,7 +236,8 @@ class BinController extends AbstractPrompsController
     /* --- the Foreign function interface (FFI)---- */
     // There are 3 external classes exported from the binary that can be used in your project
     /* 
-      First, Dialoguer from the cargo library https://docs.rs/dialoguer/latest/dialoguer/, which has been adapted for this specific use.
+      First, Dialoguer from the cargo library https://docs.rs/dialoguer/latest/dialoguer/,
+      which has been adapted for this specific use.
       More information on its use can be found in the vendor/stampy/php-cli/app/FFI/Dialoguer.php folder.
     */
     $progress = $this->newProgressBar(100);
@@ -238,7 +251,8 @@ class BinController extends AbstractPrompsController
       - Cargo library code: https://docs.rs/indice/latest/indice/, which has been adapted for this specific use.
       More information on its use can be found in the vendor/stampy/php-cli/app/FFI/Indecatif folder.
     */
-    /* the class Indicatif is alrealdy implement in the abstract class Stampy\Model\Abstract\AbstractPrompsController.php si you can you Indicatif like this */
+    /* the class Indicatif is alrealdy implement in the abstract class 
+    Stampy\Model\Abstract\AbstractPrompsController.php si you can you Indicatif like this */
     $progress = $this->newProgressBar(100);
 		for ($i=0;$i<99;$i++){
 			$progress->increment();
@@ -249,11 +263,56 @@ class BinController extends AbstractPrompsController
     // but you can use Indicatif with the same result as above
     $progress = new Indicatif(100);
 
+    //this ffi will print you a padded input directly in your terminal /dev/tty/ 
+    padding("hello, world!");
+
     /* 
-        Namespace handler that allows you to return a well-formatted namespace array as well as add or subtract a level.
+        Namespace handler that allows you to return a well-formatted namespace array as well 
+        as add or subtract a level.
         More information on its use can be found in the vendor/stampy/php-cli/app/FFI/NamespaceHandler.php folder.
     */
     $namespace = new NamespaceHandler(dirname(__DIR__,2)."scr/","App");
+	}
+}
+```   
+## ConsoleTTY
+
+ConsoleTTY is a special mount class that help you reach directly the terminal tty even in case of redirection;
+
+```php
+namespace StampyConsole;
+
+use Stampy\Model\Abstract\AbstractPrompsController;
+use Stampy\Model\Class\Object\Option_CLI;
+use Stampy\Model\Attributes\Description;
+use Stampy\Model\Attributes\Command;
+use Stampy\Model\Attributes\Option;
+use Stampy\Model\Attributes\StdErr;
+use Stampy\Model\Attributes\StdOut;
+use Stampy\Model\Attributes\StdIn;
+use \Dialoguer;
+use \NamespaceHandler;
+use \Indicatif;
+use function Stampy\padding;
+
+class BinController extends AbstractPrompsController
+{
+	#[Command('bin')]
+	public function bin(
+		null|bool|string $option1,
+		null|bool $option2,
+	){
+		/* --- for exemple -- */
+    //the method getStdOutTTY will right directly in your /dev/tty 
+    //this will right in your terminal no matter any redirection (">","2>","<")
+    // so You can use the attribute StdErr|StdOut without any redirection 
+		$this->TTY
+    ->getStdOutTTY()
+    ->write("hello");
+    // the method getStdErrTTY is 
+    $this->TTY
+    ->getStdErrTTY()
+    ->write("hello");
 	}
 }
 ```   

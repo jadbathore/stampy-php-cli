@@ -12,6 +12,7 @@ use Composer\Console\Application;
 use stdClass;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+
 class Plugin implements PluginInterface,EventSubscriberInterface {
 
     use Coloring;

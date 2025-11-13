@@ -1,6 +1,6 @@
 <?php
 
-namespace Stampy\model\class\Object;
+namespace Stampy\Model\Class\Object;
 
 use Stampy\Model\Enum\Argv;
 use Stampy\Model\Interface\ArgvInterface;

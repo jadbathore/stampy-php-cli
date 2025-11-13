@@ -3,10 +3,11 @@
 namespace Stampy\Model\Class\ControllerHandler;
 
 use ReflectionClass;
+use Stampy\Model\Abstract\AbstractControllerHandler;
 use Stampy\Model\Class\Object\Method_CLI;
 
 
-class JumpStart extends BinControllerHandler
+class JumpStart extends AbstractControllerHandler
 {
     private Method_CLI $method;
 

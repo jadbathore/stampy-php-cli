@@ -1,3 +1,22 @@
+#[macro_export]
+macro_rules! paddingPrintln {
+    ($arg:expr) => {
+        let value:&str = $arg;
+        let size_to_center = 4 + value.len();
+        let blankfiller = " ".repeat(size_to_center);
+        let bg_red_text = Style::new().on_red().apply_to($arg);
+        let bg_red_blank = Style::new().on_red().apply_to(blankfiller);
+        println!("{bg_red_blank}");
+        println!("{:^size_to_center$}",bg_red_text);
+        println!("{bg_red_blank}");
+
+        // println!($($arg2)*);
+    };
+}
+
+
+
+
 
 #[macro_export]
 macro_rules! passthrough {
@@ -87,7 +106,5 @@ macro_rules! passthrough {
         $var.get_item()
     };
 
-
-    // règle finale vide (terminaison)
     () => {};
 }

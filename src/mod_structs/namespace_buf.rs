@@ -1,11 +1,11 @@
 
 
 
-use std::{ffi::{OsStr, OsString}, fs::{self, DirEntry}, io::{self, Error}, path::PathBuf};
+use std::{ffi::{OsStr, OsString}, fs::{ DirEntry}, io::{self, Error}, path::PathBuf};
 use std::borrow::Cow;
 use phper::arrays::{ZArray};
 
-use crate::passthrough;
+use crate::{general, passthrough};
 
 #[derive(Default,Clone)]
 pub struct ClassesInNamespace<'a>
@@ -14,18 +14,18 @@ pub struct ClassesInNamespace<'a>
     path:PathBuf
 }
 
-impl ClassesInNamespace<'_> {
+impl ClassesInNamespace<'_> 
+{
 
-    fn get_entries(path:PathBuf)-> Result<Vec<DirEntry>,io::Error>
+    fn resolve_callback(index:usize,entry:&mut DirEntry,self_clone:&mut ClassesInNamespace<'_>,classes_reciever:&mut ZArray)->Result<(),(PathBuf,io::Error)>
     {
-        Ok(fs::read_dir(path)?.collect::<Result<Vec<DirEntry>, io::Error>>()?)
-    }
 
-    fn resolve_callback(index:usize,entry:&mut DirEntry,self_clone:&mut ClassesInNamespace<'_>,classes_reciever:&mut ZArray)->Result<(), io::Error>
-    {
         let mut sub_path:PathBuf = entry.path();
         sub_path.set_extension("");
-
+        if sub_path.is_dir() {
+            let err = io::Error::new(io::ErrorKind::IsADirectory, "empty namespace");
+            return Err((sub_path,err));
+        }
         if let Some(file) =  sub_path.file_name()
         {
             let namespace  = Self::format(file,self_clone.get_namespace()); 
@@ -91,7 +91,7 @@ impl<'b>  ClassesInNamespace<'b>
         self.items.to_mut().extend_from_slice(item);
     }
 
-    pub fn resolver<'a>(&mut self)->Result<ZArray,io::Error>
+    pub fn resolver<'a>(&mut self)->Result<ZArray,(PathBuf,io::Error)>
     {
         Ok(self.clone().resolve(Self::resolve_callback)?)
     }
@@ -111,18 +111,23 @@ impl<'b>  ClassesInNamespace<'b>
         passthrough!(get path_through)
     }
 
-    fn resolve<A>(mut self,builder:A) -> Result<ZArray,io::Error>
+
+    fn resolve<A>(mut self,builder:A) -> Result<ZArray,(PathBuf,io::Error)>
     where 
-        A:for<'a> Fn(usize,&mut DirEntry,&mut ClassesInNamespace<'a>,&mut ZArray) -> Result<(),io::Error>,
+        A:for<'a> Fn(usize,&mut DirEntry,&mut ClassesInNamespace<'a>,&mut ZArray) -> Result<(),(PathBuf,io::Error)>,
     {
         let mut z_array = ZArray::new();
         if let Some((start_slice,mut path_buf)) = self.get_starting_path() {
             let rests = &self.items[start_slice..];
             path_buf.extend(rests);
-            let mut vec_entries = Self::get_entries(path_buf)?;
+            let mut vec_entries = general::get_entries(path_buf.clone()).map_err(|err|(path_buf,err))?;
             self.populate_z_array(&mut vec_entries,&mut  z_array, builder)?;
         } else {
-            let mut vec_entries = Self::get_entries(self.path.clone())?;
+            let result = general::get_entries(self.path.clone());
+            if let Err(err) = result  {
+                return Err((self.path,err))
+            }
+            let mut vec_entries = result.unwrap();
             self.populate_z_array(&mut vec_entries,&mut  z_array, builder)?;
         }
         Ok(z_array)
@@ -133,7 +138,7 @@ impl<'b>  ClassesInNamespace<'b>
         if let Some(last_namespace) = self.items.last() {
             let mut clone_path = self.path.clone();
             clone_path.push(last_namespace);
-            let vec_entries: Vec<OsString> = Self::get_entries(clone_path)?.into_iter()
+            let vec_entries: Vec<OsString> = general::get_entries(clone_path)?.into_iter()
             .map(|x|{
                 x.file_name()
             }).collect();
@@ -141,12 +146,11 @@ impl<'b>  ClassesInNamespace<'b>
         } else {
             Err(Error::new(io::ErrorKind::AddrInUse, "wrong path format"))?
         }
-  
     }
 
-    fn populate_z_array<A>(&mut self,vec_entries:&mut Vec<DirEntry>,z_array:&mut ZArray,builder:A)-> Result<(),io::Error>
+    fn populate_z_array<A>(&mut self,vec_entries:&mut Vec<DirEntry>,z_array:&mut ZArray,builder:A)-> Result<(),(PathBuf,io::Error)>
     where 
-        A:for<'a> Fn(usize,&mut DirEntry,&mut ClassesInNamespace<'a>,&mut ZArray) -> Result<(),io::Error>,
+        A:for<'a> Fn(usize,&mut DirEntry,&mut ClassesInNamespace<'a>,&mut ZArray) -> Result<(),(PathBuf,io::Error)>,
     {
         for (i,value) in vec_entries.iter_mut().enumerate() {
             builder(i, value,&mut self.clone(), z_array)?;

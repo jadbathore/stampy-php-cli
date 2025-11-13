@@ -138,9 +138,10 @@ impl ProgressBarBuilder {
 impl BuilderClass for ProgressBarBuilder
 {
     type OutputType = ClassEntity<ProgressBar>;
+    const CLASS_NAME:&'static str = "Indicatif";
 
-    fn set_class(&mut self,class_name:&str) { 
-        self.class = Some(ClassEntity::new_with_state_constructor(class_name,Self::progress_closure));
+    fn set_class(&mut self) { 
+        self.class = Some(ClassEntity::new_with_state_constructor(Self::CLASS_NAME,Self::progress_closure));
         
     }
 

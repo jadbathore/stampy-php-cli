@@ -2,18 +2,15 @@
 
 namespace Stampy\Model\Class\ControllerHandler;
 
-use \Error;
 use Stampy\Model\Class\IteratorAggregate\ClassAttributHandler_CLI;
 use Stampy\Model\Attributes\Command;
 use Stampy\Model\Class\IteratorAggregate\ControllerHandler_CLI;
 use Stampy\Model\Class\IteratorAggregate\RaisedmethodHandler_CLI;
-use Stampy\Model\Class\Object\Argv_CLI;
 use ReflectionClass;
 use Stampy\Model\Abstract\AbstractControllerHandler;
 use Stampy\Model\Class\Object\Method_CLI;
-use Stampy\Model\Class\throwable\binError;
+use Stampy\Model\Class\Throwable\BinError;
 use Stampy\Model\Interface\MethodCLIInterface;
-use Stampy\Model\Enum\Argv;
 use Stampy\Model\Enum\Error as EnumError;
 use Stampy\Model\Trait\Coloring;
 
@@ -30,6 +27,7 @@ class BinControllerHandler extends AbstractControllerHandler
         array $argv,
     ) 
     {
+        parent::__construct();
         $this->controllerHandlerIterator = new ControllerHandler_CLI();
         $this->argvSetter($argv);
         $this->setAttributIterator();
@@ -40,15 +38,24 @@ class BinControllerHandler extends AbstractControllerHandler
         }
     }
 
+    public function __destruct()
+    {
+        $this->stampyConsole->getStdOutTTY()->write(PHP_EOL);
+    }
 
     private function setAttributIterator()
     {
         $tempDoubleCheck = [];
         foreach ($this->controllers as $controller) {
+            if (!class_exists($controller))
+            {
+                throw new BinError(EnumError::ClassNotFound,className:$controller);
+            }
             $reflec_class = new ReflectionClass($controller);
             $classAtributHandlerIterator = new classAttributHandler_CLI($reflec_class);
             foreach($reflec_class->getMethods() as $method)
             {
+
                 if(!empty($method->getAttributes(Command::class)))
                 {
                     $methodHandler = new method_CLI($method);
@@ -56,10 +63,11 @@ class BinControllerHandler extends AbstractControllerHandler
                         $classAtributHandlerIterator->addItem($methodHandler);
                         $tempDoubleCheck[] = $methodHandler->getCommand();
                     } else {
-                        throw new binError(
+                        throw new BinError(
                             EnumError::DoubleCommand,
-                            $method,
-                            $this->controllerHandlerIterator->getmethod($methodHandler->getCommand()),
+                            className:$controller,
+                            method1:$method,
+                            method2:$this->controllerHandlerIterator->getmethod($methodHandler->getCommand()),
                         );
                     }
                 }
@@ -73,28 +81,28 @@ class BinControllerHandler extends AbstractControllerHandler
         $this->raisedMethodIterator = new raisedmethodHandler_CLI();
     }
 
-    protected function argvSetter(array $argv)
-    {
-        $this->argvObject = new argv_CLI((count($argv)<=1)?$argv:array_slice($argv,1));
-    }
+    // protected function argvSetter(array $argv)
+    // {
+    //     $this->argvObject = new argv_CLI((count($argv)<=1)?$argv:array_slice($argv,1));
+    // }
 
-    protected function populateMethod(Method_CLI $method_CLI)
-    {
-        while($this->argvObject->isValid())
-        {
-            switch($this->argvObject->currentArgvType($method_CLI))
-            {
-                case Argv::Option:
-                    $method_CLI->addPromps($this->argvObject->getCurrent(),true);
-                break;
-                case Argv::Input:
-                    $method_CLI->addPromps($this->argvObject->getLast(),$this->argvObject->getCurrent());
-                break;
-                default: throw new Error("unknown Option '".$this->argvObject->getCurrent()."'");
-            } 
-            $this->argvObject->next();
-        } 
-    }
+    // protected function populateMethod(Method_CLI $method_CLI)
+    // {
+    //     while($this->argvObject->isValid())
+    //     {
+    //         switch($this->argvObject->currentArgvType($method_CLI))
+    //         {
+    //             case Argv::Option:
+    //                 $method_CLI->addPromps($this->argvObject->getCurrent(),true);
+    //             break;
+    //             case Argv::Input:
+    //                 $method_CLI->addPromps($this->argvObject->getLast(),$this->argvObject->getCurrent());
+    //             break;
+    //             default: throw new Error("unknown Option '".$this->argvObject->getCurrent()."'");
+    //         } 
+    //         $this->argvObject->next();
+    //     } 
+    // }
 
 
     public function start():void
@@ -104,6 +112,7 @@ class BinControllerHandler extends AbstractControllerHandler
             if($method_CLI->getCommand() == $this->argvObject->getCurrent())
             {
                 if($method_CLI->useSTD()){
+                    
                     echo implode(" ",[
                     "EXIT",
                     $method_CLI->getClass(),
@@ -142,10 +151,10 @@ class BinControllerHandler extends AbstractControllerHandler
     private function defaultDebugScript(string $color = "green"):void
     {
         foreach ($this->controllerHandlerIterator->generateMethod() as $method_CLI) {
-            $this->color(str_repeat("=", 80)."\n",$color);
+            $this->colorOut(str_repeat("=", 80)."\n",$color);
             $method_CLI->method_debug_script($color);
         }
-        $this->color(str_repeat("=", 80)."\n",$color);
+        $this->colorOut(str_repeat("=", 80)."\n",$color);
     }
 
     private function invokeDebuggingMethod():void

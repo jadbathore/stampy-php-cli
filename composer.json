@@ -2,7 +2,7 @@
     "name": "stampy/php-cli",
     "description": "stampy/php-cli is a php extension that allows you to add cli components to a vanilla php application",
     "type": "composer-plugin",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "license": "MIT",
     "autoload": {
         "psr-4": {

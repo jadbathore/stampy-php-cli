@@ -1,8 +1,25 @@
-pub trait BuilderClass 
+pub trait BuilderClass
 {
+    const CLASS_NAME:&str;
     type OutputType;
-    fn set_class(&mut self,class_name:&str);
+    fn set_class(&mut self);
     fn set_methods(&mut self);
+    fn build(self) -> Self::OutputType;
+}
+
+
+// pub trait BuilderBoundClass {
+//     type OutputType;
+//     fn set_class(&mut self,class_name:&str);
+//     fn set_methods(&mut self);
+//     fn build(self) -> Self::OutputType;
+// }
+
+
+pub trait BuilderEnum {
+    type OutputType;
+    fn set_enum(&mut self,class_name:&str);
+    fn set_case(&mut self);
     fn build(self) -> Self::OutputType;
 }
 
