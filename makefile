@@ -6,12 +6,10 @@ TARGET_WIN_X86_64=x86_64-pc-windows-gnu
 TARGET_APPLE_DARWIN=x86_64-apple-darwin
 
 self:
-# will build for(personally for target arm64 / aarch64)
 	cargo build --release 
 
 x86_64-apple:
 	cargo build --release --target=$(TARGET_APPLE_DARWIN) 
-
 
 arm64:
 	mkdir -p target/release/$(TARGET_ARM64) && \
@@ -52,5 +50,11 @@ clean:
 
 watch:
 	cargo watch -x "build --release"
+
+testR: 
+	cargo run 
+
+testD:
+	cargo run --features docker
 
 all: self linux x84_64-win

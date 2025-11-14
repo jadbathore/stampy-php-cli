@@ -179,7 +179,7 @@ class Method_CLI implements MethodCLIInterface {
                     $this->colorOut($this->getDescription(),$color,"italic");
                 break;
             }
-            echo $this->toDisplay($attribut->getName()) ?? PHP_EOL;
+            $this->stdoutTTY()->write($this->toDisplay($attribut->getName()) ?? PHP_EOL);
         }
     }
     private function getBaseName(string $class):string

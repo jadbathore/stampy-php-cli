@@ -10,10 +10,7 @@ use phper::{
 
 
 use crate::{
-        STDERR, STDIN, STDOUT, 
-        mod_enums::errors::class_error::GlobalHandlerError, 
-        mod_structs::terminal::{TerminalHandler, TerminalReadWrite, TerminalTarget}, 
-        mod_traits::builder::class::BuilderClass
+        STDERR, STDIN, STDOUT, general, mod_enums::errors::class_error::GlobalHandlerError, mod_structs::terminal::{TerminalHandler, TerminalReadWrite, TerminalTarget}, mod_traits::builder::class::BuilderClass
     };
 
 
@@ -21,6 +18,18 @@ use crate::{
 pub struct ConsoleDialoguer
 {
     class:Option<ClassEntity<TerminalHandler>>,
+}
+
+
+fn get_file_tty()->Result<File,io::Error>
+{
+    #[cfg(feature = "docker")]
+    let tty =  general::get_tty()?;
+
+    #[cfg(not(feature = "docker"))]
+    let tty = general::get_tty();
+
+    OpenOptions::new().write(true).open(String::from(tty))
 }
 
 pub enum StdStampy {
@@ -50,7 +59,7 @@ impl StdStampy {
     {
         match self {
             Self::StdErr(cursor)=>{
-                let mut tty = OpenOptions::new().write(true).open("/dev/tty")?;
+                let mut tty = get_file_tty()?;
                 tty.write(cursor.get_mut())?;
                 std::process::exit(1);
             },
@@ -70,7 +79,8 @@ fn term_target_value(z_value:&ZVal)->Result<StdStampy,phper::Error>
     
     match term_type_input {
         STDOUT => {
-            let tty = OpenOptions::new().write(true).open("/dev/tty")?;
+            
+            let tty = get_file_tty()?;
             Ok(StdStampy::StdOut(tty))
         },
         STDERR => {
@@ -105,13 +115,19 @@ impl ConsoleDialoguer
                 Ok(())
             },
             (Some(file),Some(tty),None) => {
-                let mut stdin_input   = file.expect_z_str()?.to_str()?;
+                let mut stdin_input   = file.expect_z_str()?.to_string_lossy();
                 let std = term_target_value(tty)?;
                 if stdin_input == STDIN {
-                    stdin_input = "/dev/tty";
+
+                    #[cfg(feature = "docker")]
+                    let tty = general::get_tty()?;
+
+                    #[cfg(not(feature = "docker"))]
+                    let tty  = general::get_tty();
+
+                    stdin_input = tty;
                 } 
-                let stdin = OpenOptions::new().read(true).open(stdin_input)?; 
-                // let std2 = term_target_value(terminal2)?;
+                let stdin = OpenOptions::new().read(true).open(String::from(stdin_input))?; 
                 TerminalReadWrite::set_terminal_output(terminal,stdin,std)?;
                 Ok(())
             }

@@ -17,10 +17,7 @@ use crate::{
     mod_traits::builder::class::BuilderClass
 };
 
-
-
-
-
+pub const TTY:&str = "dev/tty";
 pub const STDOUT:&str = ">";
 pub const STDERR:&str = "2>";
 pub const STDIN:&str = "<";

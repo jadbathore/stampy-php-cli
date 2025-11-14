@@ -5,22 +5,17 @@ Is a composer plugin that makes it easier to use the PHP command prompt in your 
 ## installation
 
 > [!TIP]
-> Composer will probably ask you if you want to authorize during the installation. By this message
+> "During installation, Composer will probably prompt you to authorize the plugin to run. Please answer 'yes' to this message."
 
-To start the installation of this project through composer, run the command:
+To install this project using Composer, run:
+
 ```bash
 composer require stampy/php-cli
 ```
 
-```bash
-Package operations: 1 install, 0 updates, 0 removals
-stampy/php-cli contains a Composer plugin which is currently not in your allow-plugins config. See https://getcomposer.org/allow-plugins
-Do you trust "stampy/php-cli" to execute code and wish to enable it now? (writes "allow-plugins" to composer.json) [y,n,d,?] 
-```
-Repondez "y" a cette question.
 
 > [!IMPORTANT]
-> Stampy/php-cli is a Composer plugin, so it is important that you accept this plugin in your `composer.json` folder in the following way if you have not already done so (composer will automatically format this parameter for you if you have answered "y", otherwise in `composer.json` write)
+> Stampy/php-cli is a Composer plugin. You must allow it to run by approving the prompt during installation. If you answer 'y', Composer will automatically add the permission to your composer.json file. If you answer 'no', you will need to add the following setting to your composer.json file manually:
 
 ``` json
 "config": {
@@ -29,7 +24,7 @@ Repondez "y" a cette question.
         }
     },
 ```
-After installation, the plugin will check if a pre-compiled version of the stampy library is available for your architecture.
+After installation, the plugin will check if a pre-compiled version of the Stampy library is available for your system.
 ### If a pre-compiled version **exists** for your architecture
 
 Then you would probably see this message
@@ -40,47 +35,57 @@ Generating autoload files
   continue as such
   use docker
 ```
-This means that the pre-compiled library is compatible with your architecture so you can now choose between continuing like this or using docker **an executable bash file is also added to the installation so no worries if you want to use the pre-compiled library now and later contain the command prompt**
+This confirms that the pre-compiled library is compatible with your architecture. You can now choose to continue with the native installation or use Docker.**For your convenience, an executable Bash script has been installed. This script allows you to launch the command prompt easily later, even if you use the pre-compiled library now.**
 
-Subsequently, if you use more than one namespace in your project, stampy will ask you in which namespace you wish to put the controller which will allow you to use the plugin.
+If your project uses multiple namespaces, Stampy will prompt you to select which namespace should contain the controller for the plugin.
 
-It will also create a `.env` folder at the root of your composer project through which you can use environment variables (only for the part using the plugin in your project). 
+It will also create a `.env` file at the root of your Composer project. You can use this file to define environment variables that are specific to the plugin.
 
-Finally, an executable file will be created at the root of your project named stampy, from there you can run your command prompt and thanks to that.
+Finally, an executable file named `stampy` will be created at the root of your project. You can use this file to run the command prompt.
 
 > [!CAUTION]
-> Do not remove the $NAMESPACE and $ENTRY variables from your .env folder. They are essential for the plugin to function properly.
-> You can modify these variables if you wish to activate the plugin from another location.
+> Do not remove the $NAMESPACE and $ENTRY variables from your `.env` file. They are essential for the plugin to function properly.
+> You can modify these variables if you wish to run the plugin from a different location.
 
 ### If there **doesn't exist** a precompiled version for your architecture
-Then you would probably see this message
+If the plugin fails to find a compatible pre-compiled version, it will display this message:
 ```md
 the stampy extension add no pré-compile binairy for your architecture you can compile the binairy by yourself
 using cargo or use docker.If you using cargo make sure you got cargo install (https://rust-lang.org/tools/install/).
 If you using docker make sure you docker daemon running [cargo|docker] ?
 ```
-No problem thanks to cargo a compilation of the stampy library will be carried out and will create a personalized executable for your architecture (it must be taken into consideration that because the library uses various cargo extensions it may not be suitable for all types of architecture if this is unfortunately your case I advise you to use the containerized version of the plugin).
+No problem! Stampy will use Cargo to compile the library and create a custom executable for your architecture.
+
+Please note that because the library relies on various Cargo extensions, it may not be compatible with all system architectures. If this is the case for your system, we recommend using the containerized (Docker) version of the plugin instead.
 
 ### Docker 
 
-To use docker you just had to choose the option [use docker] or docker (if you did not have a pre-compiler). Otherwise a bash script will be created during the installation and you can at any time do the following command to containerize the plugin.
+To use Docker, simply select the "[use docker]" option during installation. This is also the recommended choice if your system lacks a pre-compiler.
+
+Alternatively, a Bash script is created during installation. You can run the following command at any time to containerize the plugin:
 
 ```bash
   composer dockerStampy
 ```
 
 > [!TIP]
-> Before running the drown command, make sure you're at the root of your Composer project, i.e.
-> the directive where PHP is located.
+> Before running the command, make sure you're at the root of your Composer project, i.e., the directory that contains the composer.json file.
 
-By following the installation process you arrive at the same result as for the other installation methods: the terminal asks you in which namespace you want to use stampy then creates in your app file a controller, an .env but also a composer.stampy.json file because stampy using docker has a composer.json totally separate from the composer of your application which allows you to completely separate what the plugin can do and what your application can do.
+By following this installation process, you will achieve the same result as with the other methods: the terminal will prompt you to select a namespace for Stampy.
+
+It will then create several files in your application directory:
+- A controller
+- An .env file
+- A composer.stampy.json file
+
+This separate composer.stampy.json file exists because the Docker version of Stampy operates independently from your main application. This complete separation ensures that the plugin's dependencies and capabilities do not interfere with those of your application.
 
 > [!CAUTION]
-> When creating a new controller, be careful not to name your controller something other than an existing one, as this could overwrite your existing controller.
+> Be careful not to give your new controller the same name as an existing one, as this will overwrite it.
 
 ## Composer.json post-install
 
-After installing the plugin your `composer.json` folder will have changed a little bit first a new namespace will be created
+After installing the plugin, your composer.json file will have changed. First, a new namespace will be added to it.
 ```json
   "autoload": {
         "psr-4": {
@@ -89,12 +94,15 @@ After installing the plugin your `composer.json` folder will have changed a litt
         }
     },
 ```
-It is inside this Namespace that you could use the controllers allowing you to add the elements allowing you to build your command prompt. By default it is this namespace which is used in your .env folder you would also notice that $ENTRY corresponds to the value of your namespace **for this example** your `.env` folder should look like this
+It is within this namespace that you will use the controllers to add elements for building your command prompt. By default, this namespace is also set in your .env file.
+
+You will also notice that the $ENTRY variable corresponds to your chosen namespace value. For this example, your `.env` file should look like this:
+
 ```.env
 NAMESPACE=StampyConsole
 ENTRY=src/console/
 ```
-If the location of the controller does not suit you, you can always change it, for example
+If the location of the controller does not suit you, you can always change it, for example :
 ```.env
 NAMESPACE=App
 ENTRY=src/
@@ -309,10 +317,12 @@ class BinController extends AbstractPrompsController
 		$this->TTY
     ->getStdOutTTY()
     ->write("hello");
-    // the method getStdErrTTY is 
-    $this->TTY
-    ->getStdErrTTY()
-    ->write("hello");
+    // the method getStdErrTTY will right directly in your /dev/tty but not right it down 
+    $err = $this->TTY->getStdErrTTY();
+		$err->write("abc");
+		$err->write("efg");
+    // when you flush it you will flush all your stderr input and then exit the code
+    $err->flush();
 	}
 }
 ```   

@@ -90,6 +90,8 @@ file_put_contents(getenv("COMPOSER"),$decode);
 if(getenv("TRANSFERT")){
     $transfert_Json  = new ComposerHandler(getenv("TRANSFERT"));
     $transfert_Json->add("$stampy\\",$value."console/");
+    $transfert_Json->getStream()->{"scripts"}->dockerStampy =  "./vendor/bin/dockerStampy";
+    $transfert_Json->getStream()->{"scripts"}->execdockerStampy =  "./vendor/bin/execDockerStampy";
     $decode = json_encode($transfert_Json->getStream(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     file_put_contents(getenv("TRANSFERT"),$decode);
 }

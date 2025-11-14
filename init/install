@@ -19,7 +19,6 @@ echo "#!/bin/bash" > ../bin/execdockerStampy;
 echo "PROJECT_NAME=stampy-\$(pwd |cut -c2- | sed 's/\//-/g' | tr 'A-Z' 'a-z');" >> ../bin/execdockerStampy;
 echo "docker exec -it \$PROJECT_NAME bash" >> ../bin/execdockerStampy;
 chmod 700 ../bin/execdockerStampy;
-echo "\r"
 
 if [ "$1" -eq 1 ]; then
     exit 64
