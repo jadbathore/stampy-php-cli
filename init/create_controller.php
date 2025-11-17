@@ -44,7 +44,6 @@ echo implode("\n",[
     "$option",
     "\t\tDescription('---describe your command there---'),",
     "\t\tStdErr(\"error.log\"),",
-    "\t\tStdIn(\"composer.json\"),",
     "\t\tStdOut(\"output-file.txt\"),",
     "\t]",
     "\tpublic function $command($param){",

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 NAME=$(pwd |cut -c2- | sed 's/\//-/g' | tr 'A-Z' 'a-z');
 PROJECT_NAME=stampy-$NAME;
 IMAGE="stampy";
@@ -43,7 +42,7 @@ else
     rm ./vendor/stampy/composer.json
 fi
 docker run -it --platform linux/arm64 --name $TMP_CONTAINER $FULL_IMAGE_NAME /bin/sh -c "
-	COMPOSER=composer.json TRANSFERT=composer.stampy.json php -d extension=/usr/lib/php/20240924/stampy_php_cli.so init/docker-version/install.php > var.txt
+	COMPOSER=composer.json TRANSFERT=composer.stampy.json php -d extension=/usr/lib/php/20240924/stampy_php_cli.so init/install.php > var.txt
 ";
 
 docker cp $TMP_CONTAINER:/var.txt .env && \

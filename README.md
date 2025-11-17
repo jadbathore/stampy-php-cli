@@ -109,16 +109,16 @@ ENTRY=src/
 ```
 
 > [!WARNING]
-> Because Stampy verifies every class and method in the namespace used, it's important to use only controllers that allow Stampy to be used 
+> Because Stampy verifies every class and method in the namespace it uses, it's important to only use controllers that are compatible with Stampy. 
 > in this namespace to avoid unnecessary verification during plugin execution.
 
-You also have stampy parameter created automatically in your installation.
+You also have this stampy parameter created automatically in your installation.
 ```json
   "stampy": {
       "rebuild_after_install_or_update": false
   }
 ```
-The following setting will allow you to rebuild your stampy plugin each time you call `composer install` or `composer update`. This behavior can be annoying, so it is set to false.
+The following setting will rebuild your Stampy plugin every time you run `composer install` or `composer update`. Since this behavior can be annoying, it's disabled by default.
 
 > [!WARNING]
 > If this setting does not exist in your `composer.json` file the behavior will be considered true
@@ -127,12 +127,13 @@ The following setting will allow you to rebuild your stampy plugin each time you
 
 ## In a local context
 
-After the local installation, a bash executable will be created in the form of a bash file named `stampy`. All you have to do is call it in this way:
+After the local installation, a bash executable named `stampy` will be created. You can then run it using the following command:
 
 ```bash
   ./stampy
 ```
-If you want to activate a particular command, write it below.
+If you want to enable a specific command, enter it below like so :
+
 ```bash
   ./stampy bin
 ```
@@ -220,10 +221,19 @@ class BinController extends AbstractPrompsController
     stream_get_contents(STDIN); // return the content of the input.json file;
 		echo "hello"; // will write in the file output.txt in the root of your project
 		fwrite(STDERR,"log error"); // will write in the file error.log
-    $this->color("hello world!","green") // green text
+
+    $this->color("hello world!","green") // green text = echo green text 
+    // so if you echo the output could be redirect using stdout or err
     $this->color("hello world!","bggreen") // green background
     $this->color("hello world!","green","bold") // green text bold 
     $this->color("hello world!","green","bold","underline") // green text bold and underline
+    $this->colorOut("Hello from output","green")
+    //directly output a green text in your terminal (/dev/tty) even if there is a redirection 
+    $this->colorErr("Hello from output","green")
+    //directly output a green text in your terminal (/dev/tty) even if there is a redirection  
+    //you need to flush your result to see it on your terminal 
+    $this->TTY->getStdErrTTY()->flush();
+
     var_dump($option1,$option2) 
     /*
       |  input  (in docker shell)     |  input  (in local terminal)   |  param      |  value  | 

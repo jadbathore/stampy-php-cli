@@ -1,4 +1,3 @@
-#[cfg(not(feature = "docker"))]
 use std::borrow::Cow;
 use std::{fs::{self, DirEntry}, io, path::PathBuf};
 

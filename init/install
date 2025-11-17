@@ -32,20 +32,20 @@ elif [ "$1" -eq 2 ]; then
             break;
         fi
     done
-    COMPOSER=../../composer.json exec-php -d extension=$libfile php-cli/init/docker-version/install.php > ../../.env
+    COMPOSER=../../composer.json exec-php -d extension=$libfile php-cli/init/install.php > ../../.env
     export $(grep -v '^#' ../../.env)
     mkdir -p ../../$ENTRY;
     exec-php -d extension=$libfile php-cli/init/create_controller.php  $CONTROLLER > ../../$ENTRY$CONTROLLER.php;
     EXT_USABLE=vendor/stampy/$(echo "$libfile" | sed 's/.\/php-cli/php-cli/g');
-    EXT=$EXT_USABLE CONTEXT="vendor/stampy/php-cli/" exec-php php-cli/init/docker-version/create_bin.php > ../../stampy
+    EXT=$EXT_USABLE CONTEXT="vendor/stampy/php-cli/" exec-php php-cli/init/create_bin.php > ../../stampy
     chmod 700 ../../stampy
     exit 0
 elif [ "$1" = 0 ]; then
-    COMPOSER=../../composer.json exec-php -d extension=php-cli/$2 php-cli/init/docker-version/install.php > ../../.env
+    COMPOSER=../../composer.json exec-php -d extension=php-cli/$2 php-cli/init/install.php > ../../.env
     export $(grep -v '^#' ../../.env)
     mkdir -p ../../$ENTRY;
     exec-php -d extension=php-cli/$2 php-cli/init/create_controller.php $CONTROLLER > ../../$ENTRY$CONTROLLER.php
-    EXT="vendor/stampy/php-cli/$2" CONTEXT="vendor/stampy/php-cli/" php php-cli/init/docker-version/create_bin.php > ../../stampy
+    EXT="vendor/stampy/php-cli/$2" CONTEXT="vendor/stampy/php-cli/" php php-cli/init/create_bin.php > ../../stampy
     chmod 700 ../../stampy
     exit 0
 fi

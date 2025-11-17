@@ -4,13 +4,14 @@ ARG TAG
 FROM --platform=$BUILDPLATFORM stampy:${TAG} 
 
 
-RUN EXT="/usr/lib/php/20240924/stampy_php_cli.so" OUTPUT="tmp/" php init/docker-version/create_bin.php > usr/local/bin/stampy
+RUN EXT="/usr/lib/php/20240924/stampy_php_cli.so" OUTPUT="tmp/" php init/create_bin.php > usr/local/bin/stampy
 # # ENTRYPOINT ["stampy"];
 
 RUN apt-get update && apt-get install -y \
     unzip \
     curl \
     git \
+    nano \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

@@ -79,7 +79,6 @@ fn term_target_value(z_value:&ZVal)->Result<StdStampy,phper::Error>
     
     match term_type_input {
         STDOUT => {
-            
             let tty = get_file_tty()?;
             Ok(StdStampy::StdOut(tty))
         },

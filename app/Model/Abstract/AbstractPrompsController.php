@@ -2,11 +2,10 @@
 
 namespace Stampy\Model\Abstract;
 
-use ArrayObject;
+use Indicatif;
 use Stampy\Model\Class\Object\Option_CLI;
 use Stampy\Model\Trait\Coloring;
-use Indicatif;
-use Stampy\Model\Class\Singletone\StampyConsole;
+use Stampy\Model\Class\SingleTone\StampyConsole;
 
 abstract class AbstractPrompsController
 {

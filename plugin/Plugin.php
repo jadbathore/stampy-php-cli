@@ -79,9 +79,16 @@ class Plugin implements PluginInterface,EventSubscriberInterface {
                 if(!isset($json?->{"stampy"}?->rebuild_after_install_or_update)){ 
                     $json->stampy = new stdClass();
                     $json->{"stampy"}->rebuild_after_install_or_update = false;
+                    if (!isset($json?->{"script"})){
+                        $json->script = new stdClass();
+                    }
+                    $json->script->dockerStampy =  "./vendor/bin/dockerStampy";
+                    $json->script->execdockerStampy =  "./vendor/bin/execDockerStampy";
                     $encode = json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
                     file_put_contents($pathComposer,$encode);
                 }
+
+                
             }
         });
         $io->write($output);
