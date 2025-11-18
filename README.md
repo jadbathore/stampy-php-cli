@@ -295,7 +295,7 @@ class BinController extends AbstractPrompsController
 ```   
 ## ConsoleTTY
 
-ConsoleTTY is a special mount class that help you reach directly the terminal tty even in case of redirection;
+ConsoleTTY is a special mount class that help you reach directly the terminal tty even in case of redirection.
 
 ```php
 namespace StampyConsole;
@@ -327,7 +327,7 @@ class BinController extends AbstractPrompsController
 		$this->TTY
     ->getStdOutTTY()
     ->write("hello");
-    // the method getStdErrTTY will right directly in your /dev/tty but not right it down 
+    // the method getStdErrTTY will right directly in your /dev/tty but not write it down 
     $err = $this->TTY->getStdErrTTY();
 		$err->write("abc");
 		$err->write("efg");
